@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import RestaurantSearch from '@/components/RestaurantSearch'
+import SavedRestaurants from '@/components/SavedRestaurants'
+import SaveRestaurantModal from '@/components/SaveRestaurantModal'
 import { saveRestaurant } from '@/lib/supabase/restaurants'
 import Link from 'next/link'
 import type { User } from '@supabase/supabase-js'
@@ -16,7 +18,8 @@ interface Restaurant {
 export default function Home() {
   const [selected, setSelected] = useState<Restaurant | null>(null)
   const [user, setUser] = useState<User | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const [showSaveModal, setShowSaveModal] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -25,21 +28,19 @@ export default function Home() {
     })
   }, [])
 
-  const handleSave = async () => {
-    if (!selected) return
-    setError(null)
-    try {
-      await saveRestaurant({
-        name: selected.name,
-        address: selected.address,
-        place_id: selected.placeId,
-      })
-      alert('Saved!')
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message)
-      }
-    }
+  const handleSave = async (data: {
+    name: string
+    address: string
+    place_id: string
+    tags: string[]
+    notes: string
+    what_to_order: string
+    rating: number | null
+  }) => {
+    await saveRestaurant(data)
+    setSelected(null)
+    setShowSaveModal(false)
+    setRefreshTrigger(prev => prev + 1)
   }
 
   const handleLogout = async () => {
@@ -75,10 +76,9 @@ export default function Home() {
         <div className="mt-6 p-4 border rounded-lg bg-gray-50">
           <h2 className="font-semibold text-lg">{selected.name}</h2>
           <p className="text-gray-600 text-sm">{selected.address}</p>
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           {user ? (
             <button
-              onClick={handleSave}
+              onClick={() => setShowSaveModal(true)}
               className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
             >
               + Save
@@ -90,6 +90,19 @@ export default function Home() {
           )}
         </div>
       )}
+
+      {showSaveModal && selected && (
+        <SaveRestaurantModal
+          restaurant={selected}
+          onSave={handleSave}
+          onCancel={() => {
+            setShowSaveModal(false)
+            setSelected(null)
+          }}
+        />
+      )}
+
+      {user && <SavedRestaurants refreshTrigger={refreshTrigger} />}
     </main>
   )
 }
