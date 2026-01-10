@@ -102,7 +102,17 @@ export default function Home() {
         />
       )}
 
-      {user && <SavedRestaurants refreshTrigger={refreshTrigger} />}
+      {user && (
+        <>
+          <Link
+            href="/picker"
+            className="mt-6 w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all font-medium"
+          >
+            Can&apos;t decide? Try AI Picker
+          </Link>
+          <SavedRestaurants refreshTrigger={refreshTrigger} />
+        </>
+      )}
     </main>
   )
 }
