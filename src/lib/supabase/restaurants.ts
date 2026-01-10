@@ -121,3 +121,20 @@ export async function updateRestaurant(
   if (error) throw error
   return data
 }
+
+/**
+ * Fetches all saved restaurants for a specific user by their user ID.
+ * This is used for public profile pages and doesn't require authentication.
+ */
+export async function getRestaurantsByUserId(userId: string): Promise<SavedRestaurant[]> {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('restaurants')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data || []
+}
