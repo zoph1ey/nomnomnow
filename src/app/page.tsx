@@ -6,7 +6,7 @@ import RestaurantSearch from '@/components/RestaurantSearch'
 import SavedRestaurants from '@/components/SavedRestaurants'
 import SaveRestaurantModal from '@/components/SaveRestaurantModal'
 import CopyProfileLink from '@/components/CopyProfileLink'
-import { saveRestaurant, DietaryTag, DIETARY_TAGS } from '@/lib/supabase/restaurants'
+import { saveRestaurant, DietaryTag, DIETARY_TAGS, ContextTag, CONTEXT_TAGS } from '@/lib/supabase/restaurants'
 
 // Display labels for dietary filter chips
 const DIETARY_LABELS: Record<DietaryTag, string> = {
@@ -16,6 +16,19 @@ const DIETARY_LABELS: Record<DietaryTag, string> = {
   'gluten-free': 'Gluten-Free',
   'dairy-free': 'Dairy-Free',
   'nut-free': 'Nut-Free',
+}
+
+// Display labels for context filter chips
+const CONTEXT_LABELS: Record<ContextTag, string> = {
+  'date-night': 'Date Night',
+  'solo-friendly': 'Solo Friendly',
+  'group-friendly': 'Group Friendly',
+  'special-occasion': 'Special Occasion',
+  'quick-lunch': 'Quick Lunch',
+  'late-night': 'Late Night',
+  'family-friendly': 'Family Friendly',
+  'work-meeting': 'Work Meeting',
+  'casual-hangout': 'Casual Hangout',
 }
 import { getMyProfile, type Profile } from '@/lib/supabase/profiles'
 import Link from 'next/link'
@@ -36,6 +49,7 @@ export default function Home() {
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [priceFilter, setPriceFilter] = useState<number[]>([])
   const [dietaryFilter, setDietaryFilter] = useState<DietaryTag[]>([])
+  const [contextFilter, setContextFilter] = useState<ContextTag[]>([])
 
   const togglePriceFilter = (level: number) => {
     setPriceFilter(prev =>
@@ -47,6 +61,14 @@ export default function Home() {
 
   const toggleDietaryFilter = (tag: DietaryTag) => {
     setDietaryFilter(prev =>
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    )
+  }
+
+  const toggleContextFilter = (tag: ContextTag) => {
+    setContextFilter(prev =>
       prev.includes(tag)
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
@@ -74,6 +96,7 @@ export default function Home() {
     place_id: string
     tags: string[]
     dietary_tags: DietaryTag[]
+    context_tags: ContextTag[]
     notes: string
     what_to_order: string
     rating: number | null
@@ -222,7 +245,33 @@ export default function Home() {
             )}
           </div>
 
-          <SavedRestaurants refreshTrigger={refreshTrigger} priceFilter={priceFilter} dietaryFilter={dietaryFilter} />
+          {/* Context/Occasion Filter */}
+          <div className="mt-3 flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-gray-600">Best for:</span>
+            {CONTEXT_TAGS.map(tag => (
+              <button
+                key={tag}
+                onClick={() => toggleContextFilter(tag)}
+                className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                  contextFilter.includes(tag)
+                    ? 'bg-purple-500 text-white border-purple-500'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-purple-400'
+                }`}
+              >
+                {CONTEXT_LABELS[tag]}
+              </button>
+            ))}
+            {contextFilter.length > 0 && (
+              <button
+                onClick={() => setContextFilter([])}
+                className="text-sm text-gray-500 hover:text-gray-700 underline"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          <SavedRestaurants refreshTrigger={refreshTrigger} priceFilter={priceFilter} dietaryFilter={dietaryFilter} contextFilter={contextFilter} />
 
           {profile?.username ? (
             <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">

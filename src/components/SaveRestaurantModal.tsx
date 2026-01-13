@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { getCurrencyConfig } from '@/lib/currency'
 import { getCountryCurrency } from './RestaurantSearch'
-import { DIETARY_TAGS, DietaryTag } from '@/lib/supabase/restaurants'
+import { DIETARY_TAGS, DietaryTag, CONTEXT_TAGS, ContextTag } from '@/lib/supabase/restaurants'
 
 // Display labels for dietary tags
 const DIETARY_LABELS: Record<DietaryTag, string> = {
@@ -13,6 +13,19 @@ const DIETARY_LABELS: Record<DietaryTag, string> = {
   'gluten-free': 'Gluten-Free',
   'dairy-free': 'Dairy-Free',
   'nut-free': 'Nut-Free',
+}
+
+// Display labels for context tags
+const CONTEXT_LABELS: Record<ContextTag, string> = {
+  'date-night': 'Date Night',
+  'solo-friendly': 'Solo Friendly',
+  'group-friendly': 'Group Friendly',
+  'special-occasion': 'Special Occasion',
+  'quick-lunch': 'Quick Lunch',
+  'late-night': 'Late Night',
+  'family-friendly': 'Family Friendly',
+  'work-meeting': 'Work Meeting',
+  'casual-hangout': 'Casual Hangout',
 }
 
 const SUGGESTED_TAGS = [
@@ -35,6 +48,7 @@ interface SaveRestaurantModalProps {
     place_id: string
     tags: string[]
     dietary_tags: DietaryTag[]
+    context_tags: ContextTag[]
     notes: string
     what_to_order: string
     rating: number | null
@@ -208,6 +222,7 @@ export default function SaveRestaurantModal({
   const currency = getCountryCurrency(restaurant.countryCode)
   const [tags, setTags] = useState<string[]>([])
   const [dietaryTags, setDietaryTags] = useState<DietaryTag[]>([])
+  const [contextTags, setContextTags] = useState<ContextTag[]>([])
   const [notes, setNotes] = useState('')
   const [whatToOrder, setWhatToOrder] = useState('')
   const [rating, setRating] = useState<number | null>(null)
@@ -223,6 +238,14 @@ export default function SaveRestaurantModal({
     }
   }
 
+  const toggleContextTag = (tag: ContextTag) => {
+    if (contextTags.includes(tag)) {
+      setContextTags(contextTags.filter(t => t !== tag))
+    } else {
+      setContextTags([...contextTags, tag])
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
@@ -235,6 +258,7 @@ export default function SaveRestaurantModal({
         place_id: restaurant.placeId,
         tags,
         dietary_tags: dietaryTags,
+        context_tags: contextTags,
         notes,
         what_to_order: whatToOrder,
         rating,
@@ -301,6 +325,29 @@ export default function SaveRestaurantModal({
                     />
                     <span className="text-sm text-gray-700">{DIETARY_LABELS[tag]}</span>
                   </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Best For / Context Tags */}
+            <div>
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                Best For <span className="text-gray-400 text-xs font-normal"></span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {CONTEXT_TAGS.map(tag => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => toggleContextTag(tag)}
+                    className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                      contextTags.includes(tag)
+                        ? 'bg-purple-500 text-white border-purple-500'
+                        : 'bg-white text-gray-700 border-gray-300 hover:border-purple-400'
+                    }`}
+                  >
+                    {CONTEXT_LABELS[tag]}
+                  </button>
                 ))}
               </div>
             </div>

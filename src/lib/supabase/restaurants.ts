@@ -12,6 +12,21 @@ export const DIETARY_TAGS = [
 
 export type DietaryTag = typeof DIETARY_TAGS[number]
 
+// Context/occasion tags - describe WHEN or HOW a restaurant is best used
+export const CONTEXT_TAGS = [
+  'date-night',
+  'solo-friendly',
+  'group-friendly',
+  'special-occasion',
+  'quick-lunch',
+  'late-night',
+  'family-friendly',
+  'work-meeting',
+  'casual-hangout'
+] as const
+
+export type ContextTag = typeof CONTEXT_TAGS[number]
+
 export interface SavedRestaurant {
   id: string
   user_id: string
@@ -20,6 +35,7 @@ export interface SavedRestaurant {
   place_id: string
   tags: string[]
   dietary_tags: DietaryTag[]
+  context_tags: ContextTag[]
   notes: string | null
   what_to_order: string | null
   rating: number | null
@@ -34,6 +50,7 @@ export async function saveRestaurant(restaurant: {
   place_id: string
   tags?: string[]
   dietary_tags?: DietaryTag[]
+  context_tags?: ContextTag[]
   notes?: string
   what_to_order?: string
   rating?: number | null
@@ -55,6 +72,7 @@ export async function saveRestaurant(restaurant: {
       place_id: restaurant.place_id,
       tags: restaurant.tags || [],
       dietary_tags: restaurant.dietary_tags || [],
+      context_tags: restaurant.context_tags || [],
       notes: restaurant.notes || null,
       what_to_order: restaurant.what_to_order || null,
       rating: restaurant.rating ?? null,
@@ -124,6 +142,7 @@ export async function updateRestaurant(
     rating?: number | null
     tags?: string[]
     dietary_tags?: DietaryTag[]
+    context_tags?: ContextTag[]
     price_range?: number | null
   }
 ): Promise<SavedRestaurant> {

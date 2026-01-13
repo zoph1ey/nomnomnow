@@ -7,10 +7,13 @@ import {
   updateRestaurant,
   SavedRestaurant,
   DIETARY_TAGS,
-  DietaryTag
+  DietaryTag,
+  CONTEXT_TAGS,
+  ContextTag
 } from '@/lib/supabase/restaurants'
 import { getCurrencyConfig } from '@/lib/currency'
 import { DietaryBadges } from './DietaryBadges'
+import { ContextBadges } from './ContextBadges'
 
 // Display labels for dietary tags
 const DIETARY_LABELS: Record<DietaryTag, string> = {
@@ -22,10 +25,24 @@ const DIETARY_LABELS: Record<DietaryTag, string> = {
   'nut-free': 'Nut-Free',
 }
 
+// Display labels for context tags
+const CONTEXT_LABELS: Record<ContextTag, string> = {
+  'date-night': 'Date Night',
+  'solo-friendly': 'Solo Friendly',
+  'group-friendly': 'Group Friendly',
+  'special-occasion': 'Special Occasion',
+  'quick-lunch': 'Quick Lunch',
+  'late-night': 'Late Night',
+  'family-friendly': 'Family Friendly',
+  'work-meeting': 'Work Meeting',
+  'casual-hangout': 'Casual Hangout',
+}
+
 interface SavedRestaurantsProps {
   refreshTrigger?: number
   priceFilter?: number[]  // Array of price levels to show (empty = show all)
   dietaryFilter?: DietaryTag[]  // Array of dietary tags to filter by (empty = show all)
+  contextFilter?: ContextTag[]  // Array of context tags to filter by (empty = show all)
 }
 
 // Star rating component for display and input
@@ -109,7 +126,7 @@ function EditForm({
   saving
 }: {
   restaurant: SavedRestaurant
-  onSave: (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[] }) => void
+  onSave: (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[] }) => void
   onCancel: () => void
   saving: boolean
 }) {
@@ -118,12 +135,21 @@ function EditForm({
   const [rating, setRating] = useState<number | null>(restaurant.rating)
   const [priceRange, setPriceRange] = useState<number | null>(restaurant.price_range)
   const [dietaryTags, setDietaryTags] = useState<DietaryTag[]>(restaurant.dietary_tags || [])
+  const [contextTags, setContextTags] = useState<ContextTag[]>(restaurant.context_tags || [])
 
   const toggleDietaryTag = (tag: DietaryTag) => {
     if (dietaryTags.includes(tag)) {
       setDietaryTags(dietaryTags.filter(t => t !== tag))
     } else {
       setDietaryTags([...dietaryTags, tag])
+    }
+  }
+
+  const toggleContextTag = (tag: ContextTag) => {
+    if (contextTags.includes(tag)) {
+      setContextTags(contextTags.filter(t => t !== tag))
+    } else {
+      setContextTags([...contextTags, tag])
     }
   }
 
@@ -134,7 +160,8 @@ function EditForm({
       what_to_order: whatToOrder || '',
       rating,
       price_range: priceRange,
-      dietary_tags: dietaryTags
+      dietary_tags: dietaryTags,
+      context_tags: contextTags
     })
   }
 
@@ -166,6 +193,26 @@ function EditForm({
               />
               <span className="text-sm text-gray-700">{DIETARY_LABELS[tag]}</span>
             </label>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-900 mb-1">Best For</label>
+        <div className="flex flex-wrap gap-1.5">
+          {CONTEXT_TAGS.map(tag => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => toggleContextTag(tag)}
+              className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+                contextTags.includes(tag)
+                  ? 'bg-purple-500 text-white border-purple-500'
+                  : 'bg-white text-gray-700 border-gray-300 hover:border-purple-400'
+              }`}
+            >
+              {CONTEXT_LABELS[tag]}
+            </button>
           ))}
         </div>
       </div>
@@ -241,7 +288,7 @@ function RestaurantCard({
   onDelete
 }: {
   restaurant: SavedRestaurant
-  onUpdate: (id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[] }) => Promise<void>
+  onUpdate: (id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[] }) => Promise<void>
   onDelete: (id: string) => Promise<void>
 }) {
   const [expanded, setExpanded] = useState(false)
@@ -253,7 +300,7 @@ function RestaurantCard({
 
   const isLoading = saving || deleting
 
-  const handleSave = async (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[] }) => {
+  const handleSave = async (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[] }) => {
     setSaving(true)
     setError(null)
     try {
@@ -279,7 +326,7 @@ function RestaurantCard({
     }
   }
 
-  const hasDetails = restaurant.rating || restaurant.what_to_order || restaurant.notes || (restaurant.tags && restaurant.tags.length > 0) || (restaurant.dietary_tags && restaurant.dietary_tags.length > 0)
+  const hasDetails = restaurant.rating || restaurant.what_to_order || restaurant.notes || (restaurant.tags && restaurant.tags.length > 0) || (restaurant.dietary_tags && restaurant.dietary_tags.length > 0) || (restaurant.context_tags && restaurant.context_tags.length > 0)
 
   return (
     <div className={`p-4 border rounded-lg bg-white ${isLoading ? 'opacity-75' : ''}`}>
@@ -299,9 +346,14 @@ function RestaurantCard({
             <PriceDisplay value={restaurant.price_range} currency={restaurant.currency} />
           </div>
           <p className="text-gray-500 text-sm truncate">{restaurant.address}</p>
-            {restaurant.dietary_tags && restaurant.dietary_tags.length > 0 && (
-              <div className="mt-1">
-                <DietaryBadges tags={restaurant.dietary_tags} />
+            {(restaurant.dietary_tags?.length > 0 || restaurant.context_tags?.length > 0) && (
+              <div className="mt-1 flex flex-wrap gap-1">
+                {restaurant.dietary_tags && restaurant.dietary_tags.length > 0 && (
+                  <DietaryBadges tags={restaurant.dietary_tags} />
+                )}
+                {restaurant.context_tags && restaurant.context_tags.length > 0 && (
+                  <ContextBadges tags={restaurant.context_tags} maxDisplay={3} />
+                )}
               </div>
             )}
         </div>
@@ -429,12 +481,12 @@ function RestaurantCard({
   )
 }
 
-export default function SavedRestaurants({ refreshTrigger = 0, priceFilter = [], dietaryFilter = [] }: SavedRestaurantsProps) {
+export default function SavedRestaurants({ refreshTrigger = 0, priceFilter = [], dietaryFilter = [], contextFilter = [] }: SavedRestaurantsProps) {
   const [restaurants, setRestaurants] = useState<SavedRestaurant[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
 
-  // Filter restaurants by price range and dietary tags (empty filter = show all)
+  // Filter restaurants by price range, dietary tags, and context tags (empty filter = show all)
   const filteredRestaurants = restaurants.filter(r => {
     // Price filter: if no price filter selected, or restaurant matches price filter
     const matchesPrice = priceFilter.length === 0 || (r.price_range && priceFilter.includes(r.price_range))
@@ -443,7 +495,11 @@ export default function SavedRestaurants({ refreshTrigger = 0, priceFilter = [],
     const matchesDietary = dietaryFilter.length === 0 ||
       dietaryFilter.every(tag => r.dietary_tags?.includes(tag))
 
-    return matchesPrice && matchesDietary
+    // Context filter: restaurant must have ANY selected context tags (OR logic - show if it fits ANY occasion)
+    const matchesContext = contextFilter.length === 0 ||
+      contextFilter.some(tag => r.context_tags?.includes(tag))
+
+    return matchesPrice && matchesDietary && matchesContext
   })
 
   useEffect(() => {
@@ -465,7 +521,7 @@ export default function SavedRestaurants({ refreshTrigger = 0, priceFilter = [],
     }
   }
 
-  async function handleUpdate(id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[] }) {
+  async function handleUpdate(id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[] }) {
     const updated = await updateRestaurant(id, updates)
     setRestaurants(prev => prev.map(r => r.id === id ? updated : r))
   }
