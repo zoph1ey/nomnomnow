@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { getCurrencyConfig } from '@/lib/currency'
+import { getCountryCurrency } from './RestaurantSearch'
 
 const SUGGESTED_TAGS = [
   'korean', 'japanese', 'chinese', 'thai', 'vietnamese', 'italian', 'mexican', 'indian',
   'cafe', 'fast food', 'fine dining',
-  'cheap', 'moderate', 'expensive',
   'late night', 'breakfast', 'lunch', 'dinner',
   'date night', 'family friendly'
 ]
@@ -15,6 +16,7 @@ interface SaveRestaurantModalProps {
     name: string
     address: string
     placeId: string
+    countryCode: string | null
   }
   onSave: (data: {
     name: string
@@ -24,6 +26,8 @@ interface SaveRestaurantModalProps {
     notes: string
     what_to_order: string
     rating: number | null
+    price_range: number | null
+    currency: string
   }) => Promise<void>
   onCancel: () => void
 }
@@ -146,15 +150,55 @@ function TagSelector({
   )
 }
 
+function PriceRangeSelector({
+  value,
+  onChange,
+  currency
+}: {
+  value: number | null
+  onChange: (price: number | null) => void
+  currency: string
+}) {
+  const config = getCurrencyConfig(currency)
+  const symbols = ['$', '$$', '$$$', '$$$$']  // Universal symbols for buttons
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        {[1, 2, 3, 4].map(level => (
+          <button
+            key={level}
+            type="button"
+            onClick={() => onChange(value === level ? null : level)}
+            className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
+              value === level
+                ? 'bg-blue-500 text-white border-blue-500'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
+            }`}
+          >
+            {symbols[level - 1]}
+          </button>
+        ))}
+      </div>
+      {value && (
+        <p className="text-sm text-gray-600">{config.labels[value - 1]}</p>
+      )}
+    </div>
+  )
+}
+
 export default function SaveRestaurantModal({
   restaurant,
   onSave,
   onCancel
 }: SaveRestaurantModalProps) {
+  // Derive currency from restaurant's country
+  const currency = getCountryCurrency(restaurant.countryCode)
   const [tags, setTags] = useState<string[]>([])
   const [notes, setNotes] = useState('')
   const [whatToOrder, setWhatToOrder] = useState('')
   const [rating, setRating] = useState<number | null>(null)
+  const [priceRange, setPriceRange] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -171,7 +215,9 @@ export default function SaveRestaurantModal({
         tags,
         notes,
         what_to_order: whatToOrder,
-        rating
+        rating,
+        price_range: priceRange,
+        currency
       })
     } catch (err) {
       if (err instanceof Error) {
@@ -204,6 +250,14 @@ export default function SaveRestaurantModal({
                 Your Rating
               </label>
               <StarRating value={rating} onChange={setRating} />
+            </div>
+
+            {/* Price Range */}
+            <div>
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                Price Range <span className="text-red-500">*</span>
+              </label>
+              <PriceRangeSelector value={priceRange} onChange={setPriceRange} currency={currency} />
             </div>
 
             {/* Tags */}

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { getMyProfile, updateUsername, validateUsername, type Profile } from '@/lib/supabase/profiles'
+import { getMyProfile, updateUsername, updateCurrency, validateUsername, type Profile } from '@/lib/supabase/profiles'
+import { getSupportedCurrencies, detectCurrency } from '@/lib/currency'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
@@ -17,6 +18,9 @@ export default function SettingsPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
+  const [selectedCurrency, setSelectedCurrency] = useState('')
+  const [savingCurrency, setSavingCurrency] = useState(false)
+  const [currencySuccess, setCurrencySuccess] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -35,6 +39,7 @@ export default function SettingsPage() {
         const profileData = await getMyProfile()
         setProfile(profileData)
         setUsername(profileData?.username || '')
+        setSelectedCurrency(profileData?.currency || detectCurrency())
       } catch (err) {
         console.error('Failed to load profile:', err)
       }
@@ -72,6 +77,22 @@ export default function SettingsPage() {
       setError(err instanceof Error ? err.message : 'Failed to update username')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleCurrencyChange = async (newCurrency: string) => {
+    setSelectedCurrency(newCurrency)
+    setCurrencySuccess(false)
+    setSavingCurrency(true)
+
+    try {
+      const updated = await updateCurrency(newCurrency)
+      setProfile(updated)
+      setCurrencySuccess(true)
+    } catch (err) {
+      console.error('Failed to update currency:', err)
+    } finally {
+      setSavingCurrency(false)
     }
   }
 
@@ -155,6 +176,34 @@ export default function SettingsPage() {
             {saving ? 'Saving...' : 'Save Username'}
           </button>
         </form>
+
+        {/* Currency Selector */}
+        <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">Currency</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            Choose your local currency for price range display
+          </p>
+          <div className="flex items-center gap-3">
+            <select
+              value={selectedCurrency}
+              onChange={(e) => handleCurrencyChange(e.target.value)}
+              disabled={savingCurrency}
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+            >
+              {getSupportedCurrencies().map(c => (
+                <option key={c.code} value={c.code}>
+                  {c.symbol} - {c.name}
+                </option>
+              ))}
+            </select>
+            {savingCurrency && (
+              <span className="text-sm text-gray-500">Saving...</span>
+            )}
+            {currencySuccess && !savingCurrency && (
+              <span className="text-sm text-green-600 dark:text-green-400">Saved!</span>
+            )}
+          </div>
+        </div>
 
         {profile?.username && (
           <div className="pt-6 border-t border-gray-200 dark:border-gray-700">

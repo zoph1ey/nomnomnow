@@ -10,6 +10,8 @@ export interface SavedRestaurant {
   notes: string | null
   what_to_order: string | null
   rating: number | null
+  price_range: number | null  // 1-4 representing budget tiers
+  currency: string | null     // Currency code based on restaurant location (e.g., 'MYR', 'USD')
   created_at: string
 }
 
@@ -21,6 +23,8 @@ export async function saveRestaurant(restaurant: {
   notes?: string
   what_to_order?: string
   rating?: number | null
+  price_range?: number | null
+  currency?: string | null
 }): Promise<SavedRestaurant> {
   const supabase = createClient()
 
@@ -38,7 +42,9 @@ export async function saveRestaurant(restaurant: {
       tags: restaurant.tags || [],
       notes: restaurant.notes || null,
       what_to_order: restaurant.what_to_order || null,
-      rating: restaurant.rating ?? null
+      rating: restaurant.rating ?? null,
+      price_range: restaurant.price_range ?? null,
+      currency: restaurant.currency ?? 'USD'
     })
     .select()
     .single()
@@ -102,6 +108,7 @@ export async function updateRestaurant(
     what_to_order?: string | null
     rating?: number | null
     tags?: string[]
+    price_range?: number | null
   }
 ): Promise<SavedRestaurant> {
   const supabase = createClient()

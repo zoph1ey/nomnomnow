@@ -2,12 +2,30 @@
 
 import { useState } from 'react'
 import type { SavedRestaurant } from '@/lib/supabase/restaurants'
+import { getCurrencyConfig } from '@/lib/currency'
 
 function StarRating({ value }: { value: number | null }) {
   if (!value) return null
   return (
     <span className="text-yellow-500 dark:text-yellow-400 text-sm flex-shrink-0">
       {'★'.repeat(value)}
+    </span>
+  )
+}
+
+function PriceDisplay({ value, currency }: { value: number | null; currency: string | null }) {
+  if (!value) return null
+  const config = getCurrencyConfig(currency || 'USD')
+  return (
+    <span className="text-sm flex-shrink-0" title={config.labels[value - 1]}>
+      {[1, 2, 3, 4].map(level => (
+        <span
+          key={level}
+          className={level <= value ? 'text-blue-500 dark:text-blue-400' : 'text-gray-300 dark:text-gray-600'}
+        >
+          {config.symbol.charAt(0)}
+        </span>
+      ))}
     </span>
   )
 }
@@ -30,6 +48,7 @@ function PublicRestaurantCard({ restaurant }: { restaurant: SavedRestaurant }) {
           <div className="flex items-center gap-2 min-w-0">
             <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">{restaurant.name}</h3>
             <StarRating value={restaurant.rating} />
+            <PriceDisplay value={restaurant.price_range} currency={restaurant.currency} />
           </div>
           {hasDetails && (
             <svg

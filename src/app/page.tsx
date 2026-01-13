@@ -15,6 +15,7 @@ interface Restaurant {
   name: string
   address: string
   placeId: string
+  countryCode: string | null
 }
 
 export default function Home() {
@@ -23,6 +24,15 @@ export default function Home() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [showSaveModal, setShowSaveModal] = useState(false)
+  const [priceFilter, setPriceFilter] = useState<number[]>([])
+
+  const togglePriceFilter = (level: number) => {
+    setPriceFilter(prev =>
+      prev.includes(level)
+        ? prev.filter(l => l !== level)
+        : [...prev, level]
+    )
+  }
 
   useEffect(() => {
     const supabase = createClient()
@@ -47,6 +57,8 @@ export default function Home() {
     notes: string
     what_to_order: string
     rating: number | null
+    price_range: number | null
+    currency: string
   }) => {
     await saveRestaurant(data)
     setSelected(null)
@@ -132,7 +144,39 @@ export default function Home() {
           >
             Can&apos;t decide? Try AI Picker
           </Link>
-          <SavedRestaurants refreshTrigger={refreshTrigger} />
+
+          {/* Price Filter */}
+          <div className="mt-6 flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-gray-600">Filter by price:</span>
+            {[
+              { level: 1, label: '$' },
+              { level: 2, label: '$$' },
+              { level: 3, label: '$$$' },
+              { level: 4, label: '$$$$' }
+            ].map(({ level, label }) => (
+              <button
+                key={level}
+                onClick={() => togglePriceFilter(level)}
+                className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                  priceFilter.includes(level)
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+            {priceFilter.length > 0 && (
+              <button
+                onClick={() => setPriceFilter([])}
+                className="text-sm text-gray-500 hover:text-gray-700 underline"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          <SavedRestaurants refreshTrigger={refreshTrigger} priceFilter={priceFilter} />
 
           {profile?.username ? (
             <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">

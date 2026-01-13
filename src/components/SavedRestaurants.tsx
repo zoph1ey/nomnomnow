@@ -7,9 +7,11 @@ import {
   updateRestaurant,
   SavedRestaurant
 } from '@/lib/supabase/restaurants'
+import { getCurrencyConfig } from '@/lib/currency'
 
 interface SavedRestaurantsProps {
   refreshTrigger?: number
+  priceFilter?: number[]  // Array of price levels to show (empty = show all)
 }
 
 // Star rating component for display and input
@@ -39,6 +41,52 @@ function StarRating({
   )
 }
 
+// Price range display component
+function PriceDisplay({ value, currency }: { value: number | null; currency: string | null }) {
+  if (!value) return null
+  const config = getCurrencyConfig(currency || 'USD')
+  return (
+    <span className="text-sm flex-shrink-0" title={config.labels[value - 1]}>
+      {[1, 2, 3, 4].map(level => (
+        <span
+          key={level}
+          className={level <= value ? 'text-blue-500' : 'text-gray-300'}
+        >
+          {config.symbol.charAt(0)}
+        </span>
+      ))}
+    </span>
+  )
+}
+
+// Price range selector for edit form
+function PriceRangeSelector({
+  value,
+  onChange
+}: {
+  value: number | null
+  onChange: (price: number | null) => void
+}) {
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4].map(level => (
+        <button
+          key={level}
+          type="button"
+          onClick={() => onChange(value === level ? null : level)}
+          className={`px-2 py-1 text-sm rounded border transition-colors ${
+            value === level
+              ? 'bg-blue-500 text-white border-blue-500'
+              : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
+          }`}
+        >
+          {'$'.repeat(level)}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 // Edit form for a single restaurant
 function EditForm({
   restaurant,
@@ -47,20 +95,22 @@ function EditForm({
   saving
 }: {
   restaurant: SavedRestaurant
-  onSave: (updates: { notes: string; what_to_order: string; rating: number | null }) => void
+  onSave: (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null }) => void
   onCancel: () => void
   saving: boolean
 }) {
   const [notes, setNotes] = useState(restaurant.notes || '')
   const [whatToOrder, setWhatToOrder] = useState(restaurant.what_to_order || '')
   const [rating, setRating] = useState<number | null>(restaurant.rating)
+  const [priceRange, setPriceRange] = useState<number | null>(restaurant.price_range)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSave({
       notes: notes || '',
       what_to_order: whatToOrder || '',
-      rating
+      rating,
+      price_range: priceRange
     })
   }
 
@@ -69,6 +119,11 @@ function EditForm({
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-1">Rating</label>
         <StarRating value={rating} onChange={setRating} />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-900 mb-1">Price Range</label>
+        <PriceRangeSelector value={priceRange} onChange={setPriceRange} />
       </div>
 
       <div>
@@ -142,7 +197,7 @@ function RestaurantCard({
   onDelete
 }: {
   restaurant: SavedRestaurant
-  onUpdate: (id: string, updates: { notes: string; what_to_order: string; rating: number | null }) => Promise<void>
+  onUpdate: (id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null }) => Promise<void>
   onDelete: (id: string) => Promise<void>
 }) {
   const [expanded, setExpanded] = useState(false)
@@ -154,7 +209,7 @@ function RestaurantCard({
 
   const isLoading = saving || deleting
 
-  const handleSave = async (updates: { notes: string; what_to_order: string; rating: number | null }) => {
+  const handleSave = async (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null }) => {
     setSaving(true)
     setError(null)
     try {
@@ -197,6 +252,7 @@ function RestaurantCard({
                 {'★'.repeat(restaurant.rating)}
               </span>
             )}
+            <PriceDisplay value={restaurant.price_range} currency={restaurant.currency} />
           </div>
           <p className="text-gray-500 text-sm truncate">{restaurant.address}</p>
         </div>
@@ -324,10 +380,15 @@ function RestaurantCard({
   )
 }
 
-export default function SavedRestaurants({ refreshTrigger = 0 }: SavedRestaurantsProps) {
+export default function SavedRestaurants({ refreshTrigger = 0, priceFilter = [] }: SavedRestaurantsProps) {
   const [restaurants, setRestaurants] = useState<SavedRestaurant[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+
+  // Filter restaurants by price range (empty filter = show all)
+  const filteredRestaurants = priceFilter.length === 0
+    ? restaurants
+    : restaurants.filter(r => r.price_range && priceFilter.includes(r.price_range))
 
   useEffect(() => {
     fetchRestaurants()
@@ -348,7 +409,7 @@ export default function SavedRestaurants({ refreshTrigger = 0 }: SavedRestaurant
     }
   }
 
-  async function handleUpdate(id: string, updates: { notes: string; what_to_order: string; rating: number | null }) {
+  async function handleUpdate(id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null }) {
     const updated = await updateRestaurant(id, updates)
     setRestaurants(prev => prev.map(r => r.id === id ? updated : r))
   }
@@ -382,16 +443,20 @@ export default function SavedRestaurants({ refreshTrigger = 0 }: SavedRestaurant
         </div>
       )}
 
-      <div className="space-y-3">
-        {restaurants.map(restaurant => (
-          <RestaurantCard
-            key={restaurant.id}
-            restaurant={restaurant}
-            onUpdate={handleUpdate}
-            onDelete={handleDelete}
-          />
-        ))}
-      </div>
+      {filteredRestaurants.length === 0 ? (
+        <p className="text-gray-500 text-sm">No restaurants match the selected price filter.</p>
+      ) : (
+        <div className="space-y-3">
+          {filteredRestaurants.map(restaurant => (
+            <RestaurantCard
+              key={restaurant.id}
+              restaurant={restaurant}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

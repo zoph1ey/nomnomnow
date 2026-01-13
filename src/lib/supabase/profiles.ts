@@ -3,6 +3,7 @@ import { createClient } from './client'
 export interface Profile {
   id: string
   username: string | null
+  currency: string | null  // Currency code (e.g., 'MYR', 'USD')
   created_at: string
   updated_at: string
 }
@@ -145,6 +146,30 @@ export async function updateUsername(username: string): Promise<Profile> {
     .from('profiles')
     .update({
       username: normalized,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', user.id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+/**
+ * Update the current user's preferred currency.
+ */
+export async function updateCurrency(currency: string): Promise<Profile> {
+  const supabase = createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) throw new Error('Not logged in')
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      currency,
       updated_at: new Date().toISOString()
     })
     .eq('id', user.id)
