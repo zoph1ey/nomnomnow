@@ -1,5 +1,17 @@
 import { createClient } from './client'
 
+// Standardized dietary tags
+export const DIETARY_TAGS = [
+  'halal',
+  'vegetarian',
+  'vegan',
+  'gluten-free',
+  'dairy-free',
+  'nut-free'
+] as const
+
+export type DietaryTag = typeof DIETARY_TAGS[number]
+
 export interface SavedRestaurant {
   id: string
   user_id: string
@@ -7,6 +19,7 @@ export interface SavedRestaurant {
   address: string
   place_id: string
   tags: string[]
+  dietary_tags: DietaryTag[]
   notes: string | null
   what_to_order: string | null
   rating: number | null
@@ -20,6 +33,7 @@ export async function saveRestaurant(restaurant: {
   address: string
   place_id: string
   tags?: string[]
+  dietary_tags?: DietaryTag[]
   notes?: string
   what_to_order?: string
   rating?: number | null
@@ -40,6 +54,7 @@ export async function saveRestaurant(restaurant: {
       address: restaurant.address,
       place_id: restaurant.place_id,
       tags: restaurant.tags || [],
+      dietary_tags: restaurant.dietary_tags || [],
       notes: restaurant.notes || null,
       what_to_order: restaurant.what_to_order || null,
       rating: restaurant.rating ?? null,
@@ -108,6 +123,7 @@ export async function updateRestaurant(
     what_to_order?: string | null
     rating?: number | null
     tags?: string[]
+    dietary_tags?: DietaryTag[]
     price_range?: number | null
   }
 ): Promise<SavedRestaurant> {

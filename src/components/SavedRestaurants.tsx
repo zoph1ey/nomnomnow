@@ -5,13 +5,27 @@ import {
   getSavedRestaurants,
   deleteRestaurant,
   updateRestaurant,
-  SavedRestaurant
+  SavedRestaurant,
+  DIETARY_TAGS,
+  DietaryTag
 } from '@/lib/supabase/restaurants'
 import { getCurrencyConfig } from '@/lib/currency'
+import { DietaryBadges } from './DietaryBadges'
+
+// Display labels for dietary tags
+const DIETARY_LABELS: Record<DietaryTag, string> = {
+  'halal': 'Halal',
+  'vegetarian': 'Vegetarian',
+  'vegan': 'Vegan',
+  'gluten-free': 'Gluten-Free',
+  'dairy-free': 'Dairy-Free',
+  'nut-free': 'Nut-Free',
+}
 
 interface SavedRestaurantsProps {
   refreshTrigger?: number
   priceFilter?: number[]  // Array of price levels to show (empty = show all)
+  dietaryFilter?: DietaryTag[]  // Array of dietary tags to filter by (empty = show all)
 }
 
 // Star rating component for display and input
@@ -41,7 +55,7 @@ function StarRating({
   )
 }
 
-// Price range display component
+// Price range display component - uses universal $ symbols for consistency
 function PriceDisplay({ value, currency }: { value: number | null; currency: string | null }) {
   if (!value) return null
   const config = getCurrencyConfig(currency || 'USD')
@@ -52,7 +66,7 @@ function PriceDisplay({ value, currency }: { value: number | null; currency: str
           key={level}
           className={level <= value ? 'text-blue-500' : 'text-gray-300'}
         >
-          {config.symbol.charAt(0)}
+          $
         </span>
       ))}
     </span>
@@ -95,7 +109,7 @@ function EditForm({
   saving
 }: {
   restaurant: SavedRestaurant
-  onSave: (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null }) => void
+  onSave: (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[] }) => void
   onCancel: () => void
   saving: boolean
 }) {
@@ -103,6 +117,15 @@ function EditForm({
   const [whatToOrder, setWhatToOrder] = useState(restaurant.what_to_order || '')
   const [rating, setRating] = useState<number | null>(restaurant.rating)
   const [priceRange, setPriceRange] = useState<number | null>(restaurant.price_range)
+  const [dietaryTags, setDietaryTags] = useState<DietaryTag[]>(restaurant.dietary_tags || [])
+
+  const toggleDietaryTag = (tag: DietaryTag) => {
+    if (dietaryTags.includes(tag)) {
+      setDietaryTags(dietaryTags.filter(t => t !== tag))
+    } else {
+      setDietaryTags([...dietaryTags, tag])
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -110,7 +133,8 @@ function EditForm({
       notes: notes || '',
       what_to_order: whatToOrder || '',
       rating,
-      price_range: priceRange
+      price_range: priceRange,
+      dietary_tags: dietaryTags
     })
   }
 
@@ -124,6 +148,26 @@ function EditForm({
       <div>
         <label className="block text-sm font-medium text-gray-900 mb-1">Price Range</label>
         <PriceRangeSelector value={priceRange} onChange={setPriceRange} />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-900 mb-1">Dietary Options</label>
+        <div className="grid grid-cols-2 gap-1">
+          {DIETARY_TAGS.map(tag => (
+            <label
+              key={tag}
+              className="flex items-center gap-2 cursor-pointer p-1.5 rounded hover:bg-gray-50 transition-colors"
+            >
+              <input
+                type="checkbox"
+                checked={dietaryTags.includes(tag)}
+                onChange={() => toggleDietaryTag(tag)}
+                className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">{DIETARY_LABELS[tag]}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
       <div>
@@ -197,7 +241,7 @@ function RestaurantCard({
   onDelete
 }: {
   restaurant: SavedRestaurant
-  onUpdate: (id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null }) => Promise<void>
+  onUpdate: (id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[] }) => Promise<void>
   onDelete: (id: string) => Promise<void>
 }) {
   const [expanded, setExpanded] = useState(false)
@@ -209,7 +253,7 @@ function RestaurantCard({
 
   const isLoading = saving || deleting
 
-  const handleSave = async (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null }) => {
+  const handleSave = async (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[] }) => {
     setSaving(true)
     setError(null)
     try {
@@ -235,7 +279,7 @@ function RestaurantCard({
     }
   }
 
-  const hasDetails = restaurant.rating || restaurant.what_to_order || restaurant.notes || (restaurant.tags && restaurant.tags.length > 0)
+  const hasDetails = restaurant.rating || restaurant.what_to_order || restaurant.notes || (restaurant.tags && restaurant.tags.length > 0) || (restaurant.dietary_tags && restaurant.dietary_tags.length > 0)
 
   return (
     <div className={`p-4 border rounded-lg bg-white ${isLoading ? 'opacity-75' : ''}`}>
@@ -255,6 +299,11 @@ function RestaurantCard({
             <PriceDisplay value={restaurant.price_range} currency={restaurant.currency} />
           </div>
           <p className="text-gray-500 text-sm truncate">{restaurant.address}</p>
+            {restaurant.dietary_tags && restaurant.dietary_tags.length > 0 && (
+              <div className="mt-1">
+                <DietaryBadges tags={restaurant.dietary_tags} />
+              </div>
+            )}
         </div>
 
         {/* Action buttons */}
@@ -380,15 +429,22 @@ function RestaurantCard({
   )
 }
 
-export default function SavedRestaurants({ refreshTrigger = 0, priceFilter = [] }: SavedRestaurantsProps) {
+export default function SavedRestaurants({ refreshTrigger = 0, priceFilter = [], dietaryFilter = [] }: SavedRestaurantsProps) {
   const [restaurants, setRestaurants] = useState<SavedRestaurant[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
 
-  // Filter restaurants by price range (empty filter = show all)
-  const filteredRestaurants = priceFilter.length === 0
-    ? restaurants
-    : restaurants.filter(r => r.price_range && priceFilter.includes(r.price_range))
+  // Filter restaurants by price range and dietary tags (empty filter = show all)
+  const filteredRestaurants = restaurants.filter(r => {
+    // Price filter: if no price filter selected, or restaurant matches price filter
+    const matchesPrice = priceFilter.length === 0 || (r.price_range && priceFilter.includes(r.price_range))
+
+    // Dietary filter: restaurant must have ALL selected dietary tags (AND logic)
+    const matchesDietary = dietaryFilter.length === 0 ||
+      dietaryFilter.every(tag => r.dietary_tags?.includes(tag))
+
+    return matchesPrice && matchesDietary
+  })
 
   useEffect(() => {
     fetchRestaurants()
@@ -409,7 +465,7 @@ export default function SavedRestaurants({ refreshTrigger = 0, priceFilter = [] 
     }
   }
 
-  async function handleUpdate(id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null }) {
+  async function handleUpdate(id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[] }) {
     const updated = await updateRestaurant(id, updates)
     setRestaurants(prev => prev.map(r => r.id === id ? updated : r))
   }
@@ -444,7 +500,7 @@ export default function SavedRestaurants({ refreshTrigger = 0, priceFilter = [] 
       )}
 
       {filteredRestaurants.length === 0 ? (
-        <p className="text-gray-500 text-sm">No restaurants match the selected price filter.</p>
+        <p className="text-gray-500 text-sm">No restaurants match the selected filters.</p>
       ) : (
         <div className="space-y-3">
           {filteredRestaurants.map(restaurant => (

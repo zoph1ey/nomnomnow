@@ -3,6 +3,17 @@
 import { useState } from 'react'
 import { getCurrencyConfig } from '@/lib/currency'
 import { getCountryCurrency } from './RestaurantSearch'
+import { DIETARY_TAGS, DietaryTag } from '@/lib/supabase/restaurants'
+
+// Display labels for dietary tags
+const DIETARY_LABELS: Record<DietaryTag, string> = {
+  'halal': 'Halal',
+  'vegetarian': 'Vegetarian',
+  'vegan': 'Vegan',
+  'gluten-free': 'Gluten-Free',
+  'dairy-free': 'Dairy-Free',
+  'nut-free': 'Nut-Free',
+}
 
 const SUGGESTED_TAGS = [
   'korean', 'japanese', 'chinese', 'thai', 'vietnamese', 'italian', 'mexican', 'indian',
@@ -23,6 +34,7 @@ interface SaveRestaurantModalProps {
     address: string
     place_id: string
     tags: string[]
+    dietary_tags: DietaryTag[]
     notes: string
     what_to_order: string
     rating: number | null
@@ -195,12 +207,21 @@ export default function SaveRestaurantModal({
   // Derive currency from restaurant's country
   const currency = getCountryCurrency(restaurant.countryCode)
   const [tags, setTags] = useState<string[]>([])
+  const [dietaryTags, setDietaryTags] = useState<DietaryTag[]>([])
   const [notes, setNotes] = useState('')
   const [whatToOrder, setWhatToOrder] = useState('')
   const [rating, setRating] = useState<number | null>(null)
   const [priceRange, setPriceRange] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const toggleDietaryTag = (tag: DietaryTag) => {
+    if (dietaryTags.includes(tag)) {
+      setDietaryTags(dietaryTags.filter(t => t !== tag))
+    } else {
+      setDietaryTags([...dietaryTags, tag])
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -213,6 +234,7 @@ export default function SaveRestaurantModal({
         address: restaurant.address,
         place_id: restaurant.placeId,
         tags,
+        dietary_tags: dietaryTags,
         notes,
         what_to_order: whatToOrder,
         rating,
@@ -247,7 +269,7 @@ export default function SaveRestaurantModal({
             {/* Rating */}
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
-                Your Rating
+                Your Rating <span className="text-red-500">*</span>
               </label>
               <StarRating value={rating} onChange={setRating} />
             </div>
@@ -258,6 +280,29 @@ export default function SaveRestaurantModal({
                 Price Range <span className="text-red-500">*</span>
               </label>
               <PriceRangeSelector value={priceRange} onChange={setPriceRange} currency={currency} />
+            </div>
+
+            {/* Dietary Options */}
+            <div>
+              <label className="block text-sm font-medium text-gray-900 mb-2">
+                This restaurant accommodates:
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {DIETARY_TAGS.map(tag => (
+                  <label
+                    key={tag}
+                    className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={dietaryTags.includes(tag)}
+                      onChange={() => toggleDietaryTag(tag)}
+                      className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">{DIETARY_LABELS[tag]}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
             {/* Tags */}
@@ -302,22 +347,32 @@ export default function SaveRestaurantModal({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t flex gap-3 justify-end">
-            <button
-              type="button"
-              onClick={onCancel}
-              disabled={saving}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-            >
-              {saving ? 'Saving...' : 'Save Restaurant'}
-            </button>
+          <div className="p-4 border-t">
+            {(!rating || !priceRange) && (
+              <p className="text-sm text-amber-600 mb-3">
+                Please select: {[
+                  !rating && 'rating',
+                  !priceRange && 'price range'
+                ].filter(Boolean).join(' and ')}
+              </p>
+            )}
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={onCancel}
+                disabled={saving}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={saving || !rating || !priceRange}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {saving ? 'Saving...' : 'Save Restaurant'}
+              </button>
+            </div>
           </div>
         </form>
       </div>

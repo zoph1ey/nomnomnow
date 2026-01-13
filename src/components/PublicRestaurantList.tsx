@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { SavedRestaurant } from '@/lib/supabase/restaurants'
 import { getCurrencyConfig } from '@/lib/currency'
+import { DietaryBadges } from './DietaryBadges'
 
 function StarRating({ value }: { value: number | null }) {
   if (!value) return null
@@ -23,7 +24,7 @@ function PriceDisplay({ value, currency }: { value: number | null; currency: str
           key={level}
           className={level <= value ? 'text-blue-500 dark:text-blue-400' : 'text-gray-300 dark:text-gray-600'}
         >
-          {config.symbol.charAt(0)}
+          $
         </span>
       ))}
     </span>
@@ -36,7 +37,8 @@ function PublicRestaurantCard({ restaurant }: { restaurant: SavedRestaurant }) {
   const hasDetails = restaurant.rating ||
     restaurant.what_to_order ||
     restaurant.notes ||
-    (restaurant.tags && restaurant.tags.length > 0)
+    (restaurant.tags && restaurant.tags.length > 0) ||
+    (restaurant.dietary_tags && restaurant.dietary_tags.length > 0)
 
   return (
     <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
@@ -63,6 +65,11 @@ function PublicRestaurantCard({ restaurant }: { restaurant: SavedRestaurant }) {
           )}
         </div>
         <p className="text-gray-600 dark:text-gray-400 text-sm truncate">{restaurant.address}</p>
+        {restaurant.dietary_tags && restaurant.dietary_tags.length > 0 && (
+          <div className="mt-1">
+            <DietaryBadges tags={restaurant.dietary_tags} />
+          </div>
+        )}
       </div>
 
       {expanded && (

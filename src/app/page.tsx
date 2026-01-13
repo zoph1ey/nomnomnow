@@ -6,7 +6,17 @@ import RestaurantSearch from '@/components/RestaurantSearch'
 import SavedRestaurants from '@/components/SavedRestaurants'
 import SaveRestaurantModal from '@/components/SaveRestaurantModal'
 import CopyProfileLink from '@/components/CopyProfileLink'
-import { saveRestaurant } from '@/lib/supabase/restaurants'
+import { saveRestaurant, DietaryTag, DIETARY_TAGS } from '@/lib/supabase/restaurants'
+
+// Display labels for dietary filter chips
+const DIETARY_LABELS: Record<DietaryTag, string> = {
+  'halal': 'Halal',
+  'vegetarian': 'Vegetarian',
+  'vegan': 'Vegan',
+  'gluten-free': 'Gluten-Free',
+  'dairy-free': 'Dairy-Free',
+  'nut-free': 'Nut-Free',
+}
 import { getMyProfile, type Profile } from '@/lib/supabase/profiles'
 import Link from 'next/link'
 import type { User } from '@supabase/supabase-js'
@@ -25,12 +35,21 @@ export default function Home() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [priceFilter, setPriceFilter] = useState<number[]>([])
+  const [dietaryFilter, setDietaryFilter] = useState<DietaryTag[]>([])
 
   const togglePriceFilter = (level: number) => {
     setPriceFilter(prev =>
       prev.includes(level)
         ? prev.filter(l => l !== level)
         : [...prev, level]
+    )
+  }
+
+  const toggleDietaryFilter = (tag: DietaryTag) => {
+    setDietaryFilter(prev =>
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
     )
   }
 
@@ -54,6 +73,7 @@ export default function Home() {
     address: string
     place_id: string
     tags: string[]
+    dietary_tags: DietaryTag[]
     notes: string
     what_to_order: string
     rating: number | null
@@ -176,7 +196,33 @@ export default function Home() {
             )}
           </div>
 
-          <SavedRestaurants refreshTrigger={refreshTrigger} priceFilter={priceFilter} />
+          {/* Dietary Filter */}
+          <div className="mt-3 flex items-center gap-2 flex-wrap">
+            <span className="text-sm text-gray-600">Dietary:</span>
+            {DIETARY_TAGS.map(tag => (
+              <button
+                key={tag}
+                onClick={() => toggleDietaryFilter(tag)}
+                className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                  dietaryFilter.includes(tag)
+                    ? 'bg-green-500 text-white border-green-500'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-green-400'
+                }`}
+              >
+                {DIETARY_LABELS[tag]}
+              </button>
+            ))}
+            {dietaryFilter.length > 0 && (
+              <button
+                onClick={() => setDietaryFilter([])}
+                className="text-sm text-gray-500 hover:text-gray-700 underline"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+
+          <SavedRestaurants refreshTrigger={refreshTrigger} priceFilter={priceFilter} dietaryFilter={dietaryFilter} />
 
           {profile?.username ? (
             <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
