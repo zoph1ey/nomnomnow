@@ -126,7 +126,7 @@ function EditForm({
   saving
 }: {
   restaurant: SavedRestaurant
-  onSave: (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[] }) => void
+  onSave: (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[]; is_public: boolean }) => void
   onCancel: () => void
   saving: boolean
 }) {
@@ -136,6 +136,7 @@ function EditForm({
   const [priceRange, setPriceRange] = useState<number | null>(restaurant.price_range)
   const [dietaryTags, setDietaryTags] = useState<DietaryTag[]>(restaurant.dietary_tags || [])
   const [contextTags, setContextTags] = useState<ContextTag[]>(restaurant.context_tags || [])
+  const [isPublic, setIsPublic] = useState(restaurant.is_public ?? true)
 
   const toggleDietaryTag = (tag: DietaryTag) => {
     if (dietaryTags.includes(tag)) {
@@ -161,7 +162,8 @@ function EditForm({
       rating,
       price_range: priceRange,
       dietary_tags: dietaryTags,
-      context_tags: contextTags
+      context_tags: contextTags,
+      is_public: isPublic
     })
   }
 
@@ -239,6 +241,30 @@ function EditForm({
         />
       </div>
 
+      <div className="pt-2 border-t">
+        <label className="flex items-center gap-3 cursor-pointer">
+          <div className="relative">
+            <input
+              type="checkbox"
+              checked={isPublic}
+              onChange={(e) => setIsPublic(e.target.checked)}
+              className="sr-only"
+            />
+            <div className={`w-10 h-6 rounded-full transition-colors ${isPublic ? 'bg-blue-500' : 'bg-gray-300'}`}>
+              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${isPublic ? 'translate-x-5' : 'translate-x-1'}`} />
+            </div>
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-900">
+              {isPublic ? 'Visible on public profile' : 'Hidden from public profile'}
+            </p>
+            <p className="text-xs text-gray-500">
+              {isPublic ? 'Anyone viewing your profile can see this' : 'Only you can see this restaurant'}
+            </p>
+          </div>
+        </label>
+      </div>
+
       <div className="flex gap-2">
         <button
           type="submit"
@@ -288,7 +314,7 @@ function RestaurantCard({
   onDelete
 }: {
   restaurant: SavedRestaurant
-  onUpdate: (id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[] }) => Promise<void>
+  onUpdate: (id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[]; is_public: boolean }) => Promise<void>
   onDelete: (id: string) => Promise<void>
 }) {
   const [expanded, setExpanded] = useState(false)
@@ -300,7 +326,7 @@ function RestaurantCard({
 
   const isLoading = saving || deleting
 
-  const handleSave = async (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[] }) => {
+  const handleSave = async (updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[]; is_public: boolean }) => {
     setSaving(true)
     setError(null)
     try {
@@ -338,6 +364,13 @@ function RestaurantCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="font-medium text-gray-900 truncate">{restaurant.name}</h3>
+            {!restaurant.is_public && (
+              <span className="text-gray-400 flex-shrink-0" title="Hidden from public profile">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              </span>
+            )}
             {restaurant.rating && (
               <span className="text-yellow-500 text-sm flex-shrink-0">
                 {'★'.repeat(restaurant.rating)}
@@ -521,7 +554,7 @@ export default function SavedRestaurants({ refreshTrigger = 0, priceFilter = [],
     }
   }
 
-  async function handleUpdate(id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[] }) {
+  async function handleUpdate(id: string, updates: { notes: string; what_to_order: string; rating: number | null; price_range: number | null; dietary_tags: DietaryTag[]; context_tags: ContextTag[]; is_public: boolean }) {
     const updated = await updateRestaurant(id, updates)
     setRestaurants(prev => prev.map(r => r.id === id ? updated : r))
   }

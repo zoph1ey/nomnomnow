@@ -1,9 +1,12 @@
 import { createClient } from './client'
 
+export type ProfileVisibility = 'public' | 'friends_only' | 'private'
+
 export interface Profile {
   id: string
   username: string | null
   currency: string | null  // Currency code (e.g., 'MYR', 'USD')
+  profile_visibility: ProfileVisibility
   created_at: string
   updated_at: string
 }
@@ -170,6 +173,30 @@ export async function updateCurrency(currency: string): Promise<Profile> {
     .from('profiles')
     .update({
       currency,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', user.id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+/**
+ * Update the current user's profile visibility setting.
+ */
+export async function updateProfileVisibility(visibility: ProfileVisibility): Promise<Profile> {
+  const supabase = createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) throw new Error('Not logged in')
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({
+      profile_visibility: visibility,
       updated_at: new Date().toISOString()
     })
     .eq('id', user.id)

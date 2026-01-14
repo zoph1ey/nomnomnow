@@ -41,6 +41,7 @@ export interface SavedRestaurant {
   rating: number | null
   price_range: number | null  // 1-4 representing budget tiers
   currency: string | null     // Currency code based on restaurant location (e.g., 'MYR', 'USD')
+  is_public: boolean          // Whether to show on public profile
   created_at: string
 }
 
@@ -56,6 +57,7 @@ export async function saveRestaurant(restaurant: {
   rating?: number | null
   price_range?: number | null
   currency?: string | null
+  is_public?: boolean
 }): Promise<SavedRestaurant> {
   const supabase = createClient()
 
@@ -77,7 +79,8 @@ export async function saveRestaurant(restaurant: {
       what_to_order: restaurant.what_to_order || null,
       rating: restaurant.rating ?? null,
       price_range: restaurant.price_range ?? null,
-      currency: restaurant.currency ?? 'USD'
+      currency: restaurant.currency ?? 'USD',
+      is_public: restaurant.is_public ?? true
     })
     .select()
     .single()
@@ -144,6 +147,7 @@ export async function updateRestaurant(
     dietary_tags?: DietaryTag[]
     context_tags?: ContextTag[]
     price_range?: number | null
+    is_public?: boolean
   }
 ): Promise<SavedRestaurant> {
   const supabase = createClient()
@@ -175,6 +179,24 @@ export async function getRestaurantsByUserId(userId: string): Promise<SavedResta
     .from('restaurants')
     .select('*')
     .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data || []
+}
+
+/**
+ * Fetches only public restaurants for a specific user.
+ * Used when viewing another user's public profile.
+ */
+export async function getPublicRestaurantsByUserId(userId: string): Promise<SavedRestaurant[]> {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('restaurants')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_public', true)
     .order('created_at', { ascending: false })
 
   if (error) throw error
