@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface Message {
   role: "user" | "assistant";
@@ -19,7 +21,7 @@ interface DiscoveredPlace {
 const INITIAL_MESSAGE: Message = {
   role: "assistant",
   content:
-    "Hey! I'm here to help you figure out what to eat :) \n\n• How are you feeling? (tired, adventurous, craving comfort...)\n• Who's eating? (solo, date, friends, family...)\n• Budget? (cheap eats, moderate, treat yourself)\n• Any dietary needs today?\n\nJust give me whatever details you have and I'll find the perfect spot!",
+    "Hey! I'm here to help you figure out what to eat 🍜\n\n• How are you feeling? (tired, adventurous, craving comfort...)\n• Who's eating? (solo, date, friends, family...)\n• Budget? (cheap eats, moderate, treat yourself)\n• Any dietary needs today?\n\nJust give me whatever details you have and I'll find the perfect spot!",
 };
 
 export default function PickerChat() {
@@ -48,10 +50,9 @@ export default function PickerChat() {
     setInput("");
     setIsLoading(true);
     setError(null);
-    setDiscoveredPlaces([]); // Clear previous discoveries
+    setDiscoveredPlaces([]);
 
     try {
-      // Don't include the initial greeting in API calls
       const apiMessages = newMessages.filter((_, i) => i !== 0);
 
       const response = await fetch("/api/chat", {
@@ -74,7 +75,6 @@ export default function PickerChat() {
       const data = await response.json();
       setMessages([...newMessages, { role: "assistant", content: data.message }]);
 
-      // Handle discovered places
       if (data.discoveredPlaces && data.discoveredPlaces.length > 0) {
         setDiscoveredPlaces(data.discoveredPlaces);
       }
@@ -98,36 +98,40 @@ export default function PickerChat() {
     setDiscoveredPlaces([]);
   };
 
-  // Scroll when discovered places appear
   useEffect(() => {
     scrollToBottom();
   }, [discoveredPlaces]);
 
   return (
-    <div className="flex flex-col h-[600px] max-w-2xl mx-auto border border-gray-200 rounded-lg bg-white shadow-sm">
+    <Card className="flex flex-col h-[calc(100vh-200px)] min-h-[500px] border-orange-100 bg-white/80 py-0 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">AI Picker</h2>
-        <button
+      <div className="flex items-center justify-between px-6 py-4 border-b border-orange-100 bg-gradient-to-r from-orange-50/50 to-amber-50/50">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">💬</span>
+          <span className="font-medium">Chat with AI</span>
+        </div>
+        <Button
           onClick={resetChat}
-          className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground hover:text-foreground hover:bg-orange-50"
         >
           Start over
-        </button>
+        </Button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.map((message, index) => (
           <div
             key={index}
             className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] px-4 py-2 rounded-2xl ${
+              className={`max-w-[80%] lg:max-w-[60%] px-4 py-3 rounded-2xl ${
                 message.role === "user"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-100 text-gray-900"
+                  ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white"
+                  : "bg-orange-50 border border-orange-100"
               }`}
             >
               <p className="whitespace-pre-wrap">{message.content}</p>
@@ -137,15 +141,15 @@ export default function PickerChat() {
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 text-gray-900 px-4 py-2 rounded-2xl">
+            <div className="bg-orange-50 border border-orange-100 px-4 py-3 rounded-2xl">
               <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce" />
                 <div
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  className="w-2 h-2 bg-orange-300 rounded-full animate-bounce"
                   style={{ animationDelay: "0.1s" }}
                 />
                 <div
-                  className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                  className="w-2 h-2 bg-orange-300 rounded-full animate-bounce"
                   style={{ animationDelay: "0.2s" }}
                 />
               </div>
@@ -161,49 +165,51 @@ export default function PickerChat() {
 
         {/* Discovered Places */}
         {discoveredPlaces.length > 0 && (
-          <div className="space-y-2 p-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
-            <p className="text-sm font-medium text-purple-800">
-              Open now near you:
+          <div className="space-y-3 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
+            <p className="text-sm font-medium text-purple-800 flex items-center gap-2">
+              <span>📍</span> Open now near you:
             </p>
-            {discoveredPlaces.map((place) => (
-              <div
-                key={place.placeId}
-                className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">
-                    {place.name}
-                  </p>
-                  <p className="text-sm text-gray-500 truncate">
-                    {place.address}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-green-600 font-medium">
-                      ● Open
-                    </span>
-                    {place.rating && (
-                      <span className="text-xs text-yellow-600">
-                        ★ {place.rating.toFixed(1)}
-                      </span>
-                    )}
-                    {place.priceLevel && (
-                      <span className="text-xs text-gray-500">
-                        {"$".repeat(place.priceLevel)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <a
-                  href={`https://www.google.com/maps/place/?q=place_id:${place.placeId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-3 px-3 py-1.5 text-sm bg-purple-500 text-white rounded-full hover:bg-purple-600 transition-colors flex-shrink-0"
+            <div className="grid gap-3 lg:grid-cols-2">
+              {discoveredPlaces.map((place) => (
+                <div
+                  key={place.placeId}
+                  className="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-100 shadow-sm"
                 >
-                  View
-                </a>
-              </div>
-            ))}
-            <p className="text-xs text-gray-500 text-center mt-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">
+                      {place.name}
+                    </p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {place.address}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-green-600 font-medium">
+                        ● Open
+                      </span>
+                      {place.rating && (
+                        <span className="text-xs text-yellow-600">
+                          ★ {place.rating.toFixed(1)}
+                        </span>
+                      )}
+                      {place.priceLevel && (
+                        <span className="text-xs text-muted-foreground">
+                          {"$".repeat(place.priceLevel)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <a
+                    href={`https://www.google.com/maps/place/?q=place_id:${place.placeId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-3 px-3 py-1.5 text-sm bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-full hover:opacity-90 transition-opacity flex-shrink-0"
+                  >
+                    View
+                  </a>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-2">
               Search for these in the main page to save them!
             </p>
           </div>
@@ -213,8 +219,8 @@ export default function PickerChat() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-gray-200 p-4">
-        <div className="flex space-x-2">
+      <div className="border-t border-orange-100 p-4 bg-gradient-to-r from-orange-50/30 to-amber-50/30">
+        <div className="flex gap-3">
           <input
             type="text"
             value={input}
@@ -222,17 +228,17 @@ export default function PickerChat() {
             onKeyDown={handleKeyDown}
             placeholder="Type your message..."
             disabled={isLoading}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-full text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+            className="flex-1 px-4 py-3 border border-orange-200 rounded-full bg-white placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:opacity-50"
           />
-          <button
+          <Button
             onClick={sendMessage}
             disabled={isLoading || !input.trim()}
-            className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-6 bg-gradient-to-r from-purple-500 to-blue-500 hover:opacity-90 rounded-full"
           >
             Send
-          </button>
+          </Button>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
