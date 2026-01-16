@@ -90,7 +90,7 @@ export default function RestaurantCard({ restaurant, onUpdate, onDelete }: Resta
     (restaurant.context_tags && restaurant.context_tags.length > 0)
 
   return (
-    <div className={`p-4 border rounded-lg bg-white dark:bg-gray-900 ${isLoading ? 'opacity-75' : ''}`}>
+    <div className={`p-4 border rounded-lg bg-white dark:bg-gray-900 max-w-3xl ${isLoading ? 'opacity-75' : ''}`}>
       {/* Header row */}
       <div
         className="flex justify-between items-start gap-4 cursor-pointer"
@@ -229,9 +229,7 @@ export default function RestaurantCard({ restaurant, onUpdate, onDelete }: Resta
           {restaurant.what_to_order && (
             <p><span className="text-gray-400">Order:</span> <span className="text-gray-700 dark:text-gray-300">{restaurant.what_to_order}</span></p>
           )}
-          {restaurant.notes && (
-            <p><span className="text-gray-400">Notes:</span> <span className="text-gray-600 dark:text-gray-400 italic">{restaurant.notes}</span></p>
-          )}
+          <p><span className="text-gray-400">Notes:</span> <span className="text-gray-600 dark:text-gray-400 italic">{restaurant.notes || 'No notes'}</span></p>
         </div>
       )}
 
