@@ -84,9 +84,7 @@ export default function FriendsSection({ userId }: FriendsSectionProps) {
   }
 
   return (
-    <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Friends</h2>
-
+    <div className="space-y-6">
       <FriendSearch onRequestSent={setSentRequests} />
 
       <FriendRequestList

@@ -34,19 +34,15 @@ export default function PrivacySettings({ profile, onProfileUpdate }: PrivacySet
   }
 
   return (
-    <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">Profile Privacy</h2>
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-        Control who can see your restaurant list
-      </p>
+    <div className="space-y-3">
       <div className="space-y-2">
         {VISIBILITY_OPTIONS.map(({ value, label, description }) => (
           <label
             key={value}
             className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
               profile?.profile_visibility === value
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                ? 'border-orange-400 bg-gradient-to-r from-orange-50 to-amber-50'
+                : 'border-orange-100 hover:bg-orange-50/50'
             }`}
           >
             <input
@@ -56,20 +52,20 @@ export default function PrivacySettings({ profile, onProfileUpdate }: PrivacySet
               checked={profile?.profile_visibility === value}
               onChange={() => handleChange(value)}
               disabled={saving}
-              className="w-4 h-4 text-blue-500"
+              className="w-4 h-4 text-orange-500 accent-orange-500"
             />
             <div className="flex-1">
-              <p className="font-medium text-gray-900 dark:text-gray-100">{label}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
+              <p className="font-medium">{label}</p>
+              <p className="text-sm text-muted-foreground">{description}</p>
             </div>
           </label>
         ))}
       </div>
       {saving && (
-        <p className="mt-2 text-sm text-gray-500">Saving...</p>
+        <p className="text-sm text-muted-foreground">Saving...</p>
       )}
       {success && !saving && (
-        <p className="mt-2 text-sm text-green-600 dark:text-green-400">Privacy setting saved!</p>
+        <p className="text-sm text-green-600">✓ Privacy setting saved!</p>
       )}
     </div>
   )
