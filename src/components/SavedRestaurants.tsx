@@ -100,8 +100,7 @@ export default function SavedRestaurants({
   }
 
   return (
-    <div className="mt-8">
-      <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Your Saved Restaurants</h2>
+    <div className="mt-0">
 
       {loadError && (
         <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex justify-between items-center">
