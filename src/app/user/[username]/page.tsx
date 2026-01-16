@@ -15,8 +15,8 @@ interface Props {
 export async function generateMetadata({ params }: Props) {
   const { username } = await params
   return {
-    title: `@${username}'s Restaurants | NomNomNow`,
-    description: `Check out @${username}'s favorite restaurants on NomNomNow`
+    title: `@${username}'s Restaurants | nomnomnow`,
+    description: `Check out @${username}'s favorite restaurants on nomnomnow`
   }
 }
 
@@ -85,7 +85,7 @@ export default async function PublicProfilePage({ params }: Props) {
               </h1>
               <Button asChild className="bg-orange-500 hover:bg-orange-600">
                 <Link href="/">
-                  🍜 Join NomNomNow
+                  🍜 Join <span style={{ color: '#C44411' }}>nomnomnow</span>
                 </Link>
               </Button>
             </div>
@@ -116,7 +116,7 @@ export default async function PublicProfilePage({ params }: Props) {
                 </h1>
                 <Button asChild className="bg-orange-500 hover:bg-orange-600">
                   <Link href="/">
-                    🍜 Join NomNomNow
+                    🍜 Join <span style={{ color: '#C44411' }}>nomnomnow</span>
                   </Link>
                 </Button>
               </div>
@@ -149,7 +149,7 @@ export default async function PublicProfilePage({ params }: Props) {
             </div>
             <Button asChild className="bg-orange-500 hover:bg-orange-600">
               <Link href="/">
-                🍜 Join NomNomNow
+                🍜 Join <span style={{ color: '#C44411' }}>nomnomnow</span>
               </Link>
             </Button>
           </div>

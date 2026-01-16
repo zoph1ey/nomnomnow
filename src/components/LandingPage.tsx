@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import AuthForm from '@/components/AuthForm'
@@ -23,10 +24,14 @@ export default function LandingPage() {
           {/* Left Side - Branding */}
           <div className="space-y-8">
             <div className="space-y-4">
-              <h1 className="text-5xl lg:text-6xl font-bold tracking-tight">
-                NomNomNow
-                <span className="inline-block ml-3 animate-bounce">🍜</span>
-              </h1>
+              <Image
+                src="/logo.png"
+                alt="nomnomnow"
+                width={400}
+                height={80}
+                priority
+                className="h-auto w-[280px] lg:w-[400px]"
+              />
               <p className="text-2xl lg:text-3xl text-muted-foreground font-medium">
                 Can&apos;t decide what to eat?
               </p>

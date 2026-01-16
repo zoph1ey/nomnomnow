@@ -103,7 +103,7 @@ function buildSystemPrompt(restaurants: SavedRestaurant[]): string {
     })
     .join("\n\n");
 
-  return `You are a warm, quick food recommendation assistant for NomNomNow. Users tell you their situation upfront - make recommendations immediately without asking follow-up questions.
+  return `You are a warm, quick food recommendation assistant for nomnomnow. Users tell you their situation upfront - make recommendations immediately without asking follow-up questions.
 
 The user has saved these restaurants:
 
