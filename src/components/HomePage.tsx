@@ -11,6 +11,9 @@ import { saveRestaurant, DietaryTag, ContextTag } from '@/lib/supabase/restauran
 import { createClient } from '@/lib/supabase/client'
 import type { Profile } from '@/lib/supabase/profiles'
 import type { User } from '@supabase/supabase-js'
+import { Card, CardContent, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 
 interface Restaurant {
   name: string
@@ -59,101 +62,160 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
   }
 
   return (
-    <main className="max-w-xl mx-auto p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">NomNomNow 🍜</h1>
-        <div className="text-sm">
-          <div className="flex items-center gap-3">
-            <span className="text-gray-600 dark:text-gray-400">{user.email}</span>
-            <Link
-              href="/settings"
-              className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-              title="Settings"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </Link>
-            <button onClick={handleLogout} className="text-blue-500 hover:underline">
-              Log out
-            </button>
+    <main className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background">
+      {/* Header */}
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <h1 className="text-2xl font-bold tracking-tight">
+              <span className="text-orange-500">Nom</span>NomNow
+              <span className="inline-block ml-2">🍜</span>
+            </h1>
+
+            {/* User Actions */}
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground hidden sm:inline">
+                {profile?.username ? `@${profile.username}` : user.email}
+              </span>
+              <Button asChild variant="outline" size="sm" className="border-orange-200 hover:bg-orange-50 hover:border-orange-300">
+                <Link href="/settings">
+                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Settings
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="hover:bg-orange-50 hover:text-orange-600">
+                Log out
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Search Bar - Full Width */}
+        <div className="mb-8">
+          <RestaurantSearch onSelect={setSelected} />
+        </div>
+
+        {/* Selected Restaurant Preview */}
+        {selected && (
+          <Card className="mb-8 border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 py-0">
+            <CardContent className="py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-semibold text-lg">{selected.name}</h2>
+                  <p className="text-muted-foreground text-sm">{selected.address}</p>
+                </div>
+                <Button onClick={() => setShowSaveModal(true)} className="bg-orange-500 hover:bg-orange-600">
+                  + Save Restaurant
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {showSaveModal && selected && (
+          <SaveRestaurantModal
+            restaurant={selected}
+            onSave={handleSave}
+            onCancel={() => {
+              setShowSaveModal(false)
+              setSelected(null)
+            }}
+          />
+        )}
+
+        {/* Split Layout */}
+        <div className="grid lg:grid-cols-[380px_minmax(0,1fr)] gap-8">
+          {/* Left Sidebar - Sticky */}
+          <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+            {/* AI Picker Card */}
+            <Card>
+              <CardContent className="py-1 px-4"> {/* Standard top padding for the whole card */}
+                <CardTitle className="text-lg mb-1 leading-tight"> {/* Control the gap with mb-1 */}
+                  Can&apos;t Decide?
+                </CardTitle>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Let our AI pick the perfect spot based on your mood
+                </p>
+                <Button asChild className="w-full bg-gradient-to-r from-purple-500 to-blue-500">
+                  <Link href="/picker">✨ Try AI Picker</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Filters Card */}
+            <Card className="border-orange-100 bg-white/80">
+              <CardContent className="py-1 px-4">
+                <CardTitle className="text-base mb-2 leading-none">Filters</CardTitle>
+
+                <RestaurantFilters
+                  priceFilter={priceFilter}
+                  dietaryFilter={dietaryFilter}
+                  contextFilter={contextFilter}
+                  onPriceChange={setPriceFilter}
+                  onDietaryChange={setDietaryFilter}
+                  onContextChange={setContextFilter}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Share Profile Card */}
+            <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50/50">
+              <CardContent>
+                <CardTitle className="text-base mb-2 leading-none flex items-center gap-2">
+                  <span className="text-orange-500">👥</span> Share Your List
+                </CardTitle>
+                {profile?.username ? (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Share your restaurant recommendations with friends
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 text-sm bg-white/80 border border-orange-100 px-3 py-2 rounded-md overflow-x-auto">
+                        /user/{profile.username}
+                      </code>
+                      <CopyProfileLink username={profile.username} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Set up your username to share your list with friends!
+                    </p>
+                    <Button asChild variant="outline" className="w-full border-orange-200 hover:bg-orange-50">
+                      <Link href="/settings">
+                        Set Up Username
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Side - Restaurant List */}
+          <div className="bg-white/60 rounded-xl p-6 border border-orange-100/50">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <span className="text-orange-500">📍</span> Your Saved Restaurants
+              </h2>
+            </div>
+            <Separator className="mb-6 bg-orange-100" />
+            <SavedRestaurants
+              refreshTrigger={refreshTrigger}
+              priceFilter={priceFilter}
+              dietaryFilter={dietaryFilter}
+              contextFilter={contextFilter}
+            />
           </div>
         </div>
       </div>
-
-      <RestaurantSearch onSelect={setSelected} />
-
-      {selected && (
-        <div className="mt-6 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
-          <h2 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{selected.name}</h2>
-          <p className="text-gray-600 dark:text-gray-400 text-sm">{selected.address}</p>
-          <button
-            onClick={() => setShowSaveModal(true)}
-            className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-          >
-            + Save
-          </button>
-        </div>
-      )}
-
-      {showSaveModal && selected && (
-        <SaveRestaurantModal
-          restaurant={selected}
-          onSave={handleSave}
-          onCancel={() => {
-            setShowSaveModal(false)
-            setSelected(null)
-          }}
-        />
-      )}
-
-      <Link
-        href="/picker"
-        className="mt-6 w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all font-medium"
-      >
-        Can&apos;t decide? Try AI Picker
-      </Link>
-
-      <RestaurantFilters
-        priceFilter={priceFilter}
-        dietaryFilter={dietaryFilter}
-        contextFilter={contextFilter}
-        onPriceChange={setPriceFilter}
-        onDietaryChange={setDietaryFilter}
-        onContextChange={setContextFilter}
-      />
-
-      <SavedRestaurants
-        refreshTrigger={refreshTrigger}
-        priceFilter={priceFilter}
-        dietaryFilter={dietaryFilter}
-        contextFilter={contextFilter}
-      />
-
-      {profile?.username ? (
-        <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-          <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Share your restaurant list:</p>
-          <div className="flex items-center gap-2">
-            <code className="flex-1 text-sm bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto text-gray-800 dark:text-gray-200">
-              /user/{profile.username}
-            </code>
-            <CopyProfileLink username={profile.username} />
-          </div>
-        </div>
-      ) : (
-        <div className="mt-6 p-4 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-lg">
-          <p className="text-sm text-blue-800 dark:text-blue-300 mb-2">
-            Set up your username to share your restaurant list with friends!
-          </p>
-          <Link
-            href="/settings"
-            className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium"
-          >
-            Go to settings
-          </Link>
-        </div>
-      )}
     </main>
   )
 }
