@@ -14,18 +14,39 @@ export default function Home() {
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      setUser(user)
-      if (user) {
-        try {
+
+    // Check auth and load profile
+    const loadUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (user) {
+          setUser(user)
           const profileData = await getMyProfile()
           setProfile(profileData)
-        } catch (err) {
-          console.error('Failed to load profile:', err)
+        } else {
+          setUser(null)
+          setProfile(null)
         }
+      } catch (err) {
+        console.error('Auth error:', err)
+        setUser(null)
+        setProfile(null)
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
+    }
+
+    loadUser()
+
+    // Listen for auth changes (login/logout only, not initial)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        loadUser()
+      }
     })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   const handleLogout = () => {
