@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import AuthForm from '@/components/AuthForm'
+import { AnimatedGradientDemo } from '@/components/GradientLanding';
 
 export default function LandingPage() {
   const [highlightForm, setHighlightForm] = useState(false)
@@ -59,66 +60,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Stats Section - Compact */}
-      <section className="bg-secondary/50 py-8">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-3 gap-6 text-center">
-            <div>
-              <p className="text-3xl font-bold text-primary">80%</p>
-              <p className="text-sm text-muted-foreground">don&apos;t know what they want</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-primary">90%</p>
-              <p className="text-sm text-muted-foreground">go back to places they know</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-primary">70%</p>
-              <p className="text-sm text-muted-foreground">forget restaurant recommendations</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section - Compact */}
-      <section className="py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-center mb-8">How It Works</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-2xl">✨</span>
-              </div>
-              <h3 className="font-semibold text-lg">AI Mood Picker</h3>
-              <p className="text-sm text-muted-foreground">
-                Our AI asks a few quick questions about your mood and cravings, then picks the perfect restaurant.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-2xl">📍</span>
-              </div>
-              <h3 className="font-semibold text-lg">Your Restaurant List</h3>
-              <p className="text-sm text-muted-foreground">
-                Save all your spots with ratings, notes, and tags like &quot;date night&quot; or &quot;quick lunch&quot;.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-2xl">👥</span>
-              </div>
-              <h3 className="font-semibold text-lg">Share with Friends</h3>
-              <p className="text-sm text-muted-foreground">
-                Get trusted recommendations from people you know. Share your profile or keep it private.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AnimatedGradientDemo />
 
       <Separator />
 
