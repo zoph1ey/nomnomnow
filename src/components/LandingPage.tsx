@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import AuthForm from '@/components/AuthForm'
 import { AnimatedGradientDemo } from '@/components/GradientLanding';
+import FoodScrollingBackground from '@/components/FoodScrollingBackground';
 
 export default function LandingPage() {
   const [highlightForm, setHighlightForm] = useState(false)
@@ -19,8 +20,13 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen">
       {/* Hero Section - Split Layout */}
-      <section className="min-h-[85vh] flex items-center">
-        <div className="w-full max-w-7xl mx-auto px-6 py-12 grid lg:grid-cols-2 gap-12 items-center">
+      <section className="min-h-[85vh] flex items-center relative">
+        {/* Background decoration */}
+        <div className="absolute inset-0 z-0 opacity-10 pointer-events-none overflow-hidden">
+          <FoodScrollingBackground />
+        </div>
+
+        <div className="w-full max-w-7xl mx-auto px-6 py-12 grid lg:grid-cols-2 gap-12 items-center relative z-10">
           {/* Left Side - Branding */}
           <div className="space-y-8">
             <div className="space-y-4">
