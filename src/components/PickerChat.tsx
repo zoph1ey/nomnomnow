@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { BotMessageSquareIcon, type BotMessageSquareHandle } from "@/components/ui/bot-message-square";
+import { RefreshCWIcon, type RefreshCCWIconWIcon } from "@/components/ui/refresh-cw";
 
 interface Message {
   role: "user" | "assistant";
@@ -21,8 +23,29 @@ interface DiscoveredPlace {
 const INITIAL_MESSAGE: Message = {
   role: "assistant",
   content:
-    "Hey! I'm here to help you figure out what to eat 🍜\n\n• How are you feeling? (tired, adventurous, craving comfort...)\n• Who's eating? (solo, date, friends, family...)\n• Budget? (cheap eats, moderate, treat yourself)\n• Any dietary needs today?\n\nJust give me whatever details you have and I'll find the perfect spot!",
+    "Hey! I'm here to help you figure out what to eat :) \n\n• How are you feeling? (tired, adventurous, craving comfort...)\n• Who's eating? (solo, date, friends, family...)\n• Budget? (cheap eats, moderate, treat yourself)\n• Any dietary needs today?\n\nJust give me whatever details you have and I'll find the perfect spot!",
 };
+
+function AssistantMessage({ content }: { content: string }) {
+  const iconRef = useRef<BotMessageSquareHandle>(null);
+
+  return (
+    <div className="flex justify-start items-end gap-2">
+      <BotMessageSquareIcon
+        ref={iconRef}
+        size={24}
+        className="text-purple-500 flex-shrink-0 mb-1"
+      />
+      <div
+        className="max-w-[80%] lg:max-w-[60%] px-4 py-3 rounded-2xl bg-orange-50 border border-orange-100 cursor-default"
+        onMouseEnter={() => iconRef.current?.startAnimation()}
+        onMouseLeave={() => iconRef.current?.stopAnimation()}
+      >
+        <p className="whitespace-pre-wrap">{content}</p>
+      </div>
+    </div>
+  );
+}
 
 export default function PickerChat() {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
@@ -31,6 +54,7 @@ export default function PickerChat() {
   const [error, setError] = useState<string | null>(null);
   const [discoveredPlaces, setDiscoveredPlaces] = useState<DiscoveredPlace[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const refreshIconRef = useRef<RefreshCCWIconWIcon>(null);
   const { latitude, longitude } = useGeolocation();
 
   const scrollToBottom = () => {
@@ -106,41 +130,37 @@ export default function PickerChat() {
     <Card className="flex flex-col h-[calc(100vh-200px)] min-h-[500px] border-orange-100 bg-white/80 py-0 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-orange-100 bg-gradient-to-r from-orange-50/50 to-amber-50/50">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">💬</span>
-          <span className="font-medium">Chat with AI</span>
-        </div>
+        <span className="font-medium">Chat with AI</span>
         <Button
           onClick={resetChat}
           variant="ghost"
           size="sm"
-          className="text-muted-foreground hover:text-foreground hover:bg-orange-50"
+          className="text-muted-foreground hover:text-foreground hover:bg-orange-50 flex items-center gap-1.5"
+          onMouseEnter={() => refreshIconRef.current?.startAnimation()}
+          onMouseLeave={() => refreshIconRef.current?.stopAnimation()}
         >
+          <RefreshCWIcon ref={refreshIconRef} size={16} />
           Start over
         </Button>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[80%] lg:max-w-[60%] px-4 py-3 rounded-2xl ${
-                message.role === "user"
-                  ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white"
-                  : "bg-orange-50 border border-orange-100"
-              }`}
-            >
-              <p className="whitespace-pre-wrap">{message.content}</p>
+        {messages.map((message, index) =>
+          message.role === "user" ? (
+            <div key={index} className="flex justify-end">
+              <div className="max-w-[80%] lg:max-w-[60%] px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+                <p className="whitespace-pre-wrap">{message.content}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ) : (
+            <AssistantMessage key={index} content={message.content} />
+          )
+        )}
 
         {isLoading && (
-          <div className="flex justify-start">
+          <div className="flex justify-start items-end gap-2">
+            <BotMessageSquareIcon size={24} className="text-purple-500 flex-shrink-0 mb-1" />
             <div className="bg-orange-50 border border-orange-100 px-4 py-3 rounded-2xl">
               <div className="flex space-x-1">
                 <div className="w-2 h-2 bg-orange-300 rounded-full animate-bounce" />

@@ -11,7 +11,7 @@ export default function PriceDisplay({ value, currency }: PriceDisplayProps) {
   const config = getCurrencyConfig(currency || 'USD')
 
   return (
-    <span className="text-sm flex-shrink-0" title={config.labels[value - 1]}>
+    <span className="text-base flex-shrink-0" title={config.labels[value - 1]}>
       {[1, 2, 3, 4].map(level => (
         <span
           key={level}

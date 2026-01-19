@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getMyProfile, type Profile } from '@/lib/supabase/profiles'
 import { detectCurrency } from '@/lib/currency'
@@ -15,17 +15,16 @@ import CopyProfileLink from '@/components/CopyProfileLink'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { SettingsIcon, type SettingsIconHandle } from '@/components/ui/settings'
+import { UserIcon, type UserIconHandle } from '@/components/ui/user'
+import { FilePenLineIcon, type FilePenLineIconHandle } from '@/components/ui/file-pen-line'
+import { CircleDollarSignIcon, type CircleDollarSignIconHandle } from '@/components/ui/circle-dollar-sign'
+import { LockOpenIcon, type LockOpenIconHandle } from '@/components/ui/lock-open'
+import { UserRoundPlusIcon, type UserRoundPlusIconHandle } from '@/components/ui/user-round-plus'
+import { LinkIcon, type LinkIconHandle } from '@/components/ui/link'
 
 type SettingsSection = 'account' | 'profile' | 'currency' | 'privacy' | 'friends' | 'share'
 
-const SETTINGS_NAV: { id: SettingsSection; label: string; icon: string; description: string }[] = [
-  { id: 'account', label: 'Account', icon: '👤', description: 'Your account details' },
-  { id: 'profile', label: 'Profile', icon: '✏️', description: 'Username & public profile' },
-  { id: 'currency', label: 'Currency', icon: '💰', description: 'Price display preferences' },
-  { id: 'privacy', label: 'Privacy', icon: '🔒', description: 'Who can see your list' },
-  { id: 'friends', label: 'Friends', icon: '👥', description: 'Manage your connections' },
-  { id: 'share', label: 'Share', icon: '🔗', description: 'Share your profile' },
-]
 
 export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null)
@@ -33,6 +32,13 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [activeSection, setActiveSection] = useState<SettingsSection>('account')
   const router = useRouter()
+  const settingsIconRef = useRef<SettingsIconHandle>(null)
+  const accountIconRef = useRef<UserIconHandle>(null)
+  const profileIconRef = useRef<FilePenLineIconHandle>(null)
+  const currencyIconRef = useRef<CircleDollarSignIconHandle>(null)
+  const privacyIconRef = useRef<LockOpenIconHandle>(null)
+  const friendsIconRef = useRef<UserRoundPlusIconHandle>(null)
+  const shareIconRef = useRef<LinkIconHandle>(null)
 
   useEffect(() => {
     async function loadData() {
@@ -209,7 +215,11 @@ export default function SettingsPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background">
       {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <header
+        className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50"
+        onMouseEnter={() => settingsIconRef.current?.startAnimation()}
+        onMouseLeave={() => settingsIconRef.current?.stopAnimation()}
+      >
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm" className="hover:bg-orange-50">
@@ -221,8 +231,8 @@ export default function SettingsPage() {
               </Link>
             </Button>
             <Separator orientation="vertical" className="h-6 bg-orange-200" />
-            <h1 className="text-xl font-bold tracking-tight">
-              <span className="text-orange-500">⚙️</span> Settings
+            <h1 className="text-xl font-bold tracking-tight flex items-center gap-2">
+              <SettingsIcon ref={settingsIconRef} className="text-orange-500" size={24} /> Settings
             </h1>
           </div>
         </div>
@@ -235,30 +245,119 @@ export default function SettingsPage() {
           <div className="space-y-2 lg:sticky lg:top-24 lg:self-start">
             <Card className="border-orange-100 bg-white/80">
               <CardContent className="p-2">
-                {SETTINGS_NAV.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveSection(item.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                      activeSection === item.id
-                        ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
-                        : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <span className="text-lg">{item.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm ${activeSection === item.id ? 'font-medium' : ''}`}>
-                        {item.label}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {item.description}
-                      </p>
-                    </div>
-                    {activeSection === item.id && (
-                      <div className="w-1 h-8 bg-orange-400 rounded-full" />
-                    )}
-                  </button>
-                ))}
+                {/* Account */}
+                <button
+                  onClick={() => setActiveSection('account')}
+                  onMouseEnter={() => accountIconRef.current?.startAnimation()}
+                  onMouseLeave={() => accountIconRef.current?.stopAnimation()}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeSection === 'account'
+                      ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
+                      : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <UserIcon ref={accountIconRef} size={20} className={activeSection === 'account' ? 'text-orange-500' : ''} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${activeSection === 'account' ? 'font-medium' : ''}`}>Account</p>
+                    <p className="text-xs text-muted-foreground truncate">Your account information</p>
+                  </div>
+                  {activeSection === 'account' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                </button>
+
+                {/* Profile */}
+                <button
+                  onClick={() => setActiveSection('profile')}
+                  onMouseEnter={() => profileIconRef.current?.startAnimation()}
+                  onMouseLeave={() => profileIconRef.current?.stopAnimation()}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeSection === 'profile'
+                      ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
+                      : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <FilePenLineIcon ref={profileIconRef} size={20} className={activeSection === 'profile' ? 'text-orange-500' : ''} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${activeSection === 'profile' ? 'font-medium' : ''}`}>Profile</p>
+                    <p className="text-xs text-muted-foreground truncate">Username & public profile</p>
+                  </div>
+                  {activeSection === 'profile' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                </button>
+
+                {/* Currency */}
+                <button
+                  onClick={() => setActiveSection('currency')}
+                  onMouseEnter={() => currencyIconRef.current?.startAnimation()}
+                  onMouseLeave={() => currencyIconRef.current?.stopAnimation()}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeSection === 'currency'
+                      ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
+                      : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <CircleDollarSignIcon ref={currencyIconRef} size={20} className={activeSection === 'currency' ? 'text-orange-500' : ''} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${activeSection === 'currency' ? 'font-medium' : ''}`}>Currency</p>
+                    <p className="text-xs text-muted-foreground truncate">Price display preferences</p>
+                  </div>
+                  {activeSection === 'currency' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                </button>
+
+                {/* Privacy */}
+                <button
+                  onClick={() => setActiveSection('privacy')}
+                  onMouseEnter={() => privacyIconRef.current?.startAnimation()}
+                  onMouseLeave={() => privacyIconRef.current?.stopAnimation()}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeSection === 'privacy'
+                      ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
+                      : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <LockOpenIcon ref={privacyIconRef} size={20} className={activeSection === 'privacy' ? 'text-orange-500' : ''} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${activeSection === 'privacy' ? 'font-medium' : ''}`}>Privacy</p>
+                    <p className="text-xs text-muted-foreground truncate">Who can see your list</p>
+                  </div>
+                  {activeSection === 'privacy' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                </button>
+
+                {/* Friends */}
+                <button
+                  onClick={() => setActiveSection('friends')}
+                  onMouseEnter={() => friendsIconRef.current?.startAnimation()}
+                  onMouseLeave={() => friendsIconRef.current?.stopAnimation()}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeSection === 'friends'
+                      ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
+                      : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <UserRoundPlusIcon ref={friendsIconRef} size={20} className={activeSection === 'friends' ? 'text-orange-500' : ''} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${activeSection === 'friends' ? 'font-medium' : ''}`}>Friends</p>
+                    <p className="text-xs text-muted-foreground truncate">Manage your connections</p>
+                  </div>
+                  {activeSection === 'friends' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                </button>
+
+                {/* Share */}
+                <button
+                  onClick={() => setActiveSection('share')}
+                  onMouseEnter={() => shareIconRef.current?.startAnimation()}
+                  onMouseLeave={() => shareIconRef.current?.stopAnimation()}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    activeSection === 'share'
+                      ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
+                      : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <LinkIcon ref={shareIconRef} size={20} className={activeSection === 'share' ? 'text-orange-500' : ''} />
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${activeSection === 'share' ? 'font-medium' : ''}`}>Share</p>
+                    <p className="text-xs text-muted-foreground truncate">Share your profile</p>
+                  </div>
+                  {activeSection === 'share' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                </button>
               </CardContent>
             </Card>
           </div>

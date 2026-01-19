@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import PickerChat from "@/components/PickerChat";
 import Link from "next/link";
@@ -8,10 +8,12 @@ import type { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { BotMessageSquareIcon, type BotMessageSquareHandle } from "@/components/ui/bot-message-square";
 
 export default function PickerPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const botIconRef = useRef<BotMessageSquareHandle>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -34,7 +36,11 @@ export default function PickerPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background">
       {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <header
+        className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50"
+        onMouseEnter={() => botIconRef.current?.startAnimation()}
+        onMouseLeave={() => botIconRef.current?.stopAnimation()}
+      >
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm" className="hover:bg-orange-50">
@@ -46,8 +52,8 @@ export default function PickerPage() {
               </Link>
             </Button>
             <Separator orientation="vertical" className="h-6 bg-orange-200" />
-            <h1 className="text-xl font-bold tracking-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500">✨</span> AI Picker
+            <h1 className="text-xl font-bold tracking-tight flex items-center gap-2">
+              <BotMessageSquareIcon ref={botIconRef} size={24} className="text-purple-500" /> AI Picker
             </h1>
           </div>
         </div>

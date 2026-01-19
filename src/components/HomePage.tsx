@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import RestaurantSearch from '@/components/RestaurantSearch'
 import SavedRestaurants from '@/components/SavedRestaurants'
@@ -14,6 +14,11 @@ import type { User } from '@supabase/supabase-js'
 import { Card, CardContent, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { UsersIcon, type UsersIconHandle } from '@/components/ui/users'
+import { BotMessageSquareIcon, type BotMessageSquareHandle } from '@/components/ui/bot-message-square'
+import { MapPinIcon, type MapPinIconHandle } from '@/components/ui/map-pin'
+import { SettingsIcon, type SettingsIconHandle } from '@/components/ui/settings'
+import { LogoutIcon, type LogoutIconHandle } from '@/components/ui/logout'
 
 interface Restaurant {
   name: string
@@ -35,6 +40,11 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
   const [priceFilter, setPriceFilter] = useState<number[]>([])
   const [dietaryFilter, setDietaryFilter] = useState<DietaryTag[]>([])
   const [contextFilter, setContextFilter] = useState<ContextTag[]>([])
+  const usersIconRef = useRef<UsersIconHandle>(null)
+  const botIconRef = useRef<BotMessageSquareHandle>(null)
+  const mapPinIconRef = useRef<MapPinIconHandle>(null)
+  const settingsIconRef = useRef<SettingsIconHandle>(null)
+  const logoutIconRef = useRef<LogoutIconHandle>(null)
 
   const handleSave = async (data: {
     name: string
@@ -81,16 +91,27 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
               <span className="text-sm text-muted-foreground hidden sm:inline">
                 {profile?.username ? `@${profile.username}` : user.email}
               </span>
-              <Button asChild size="sm" className="bg-orange-500 hover:bg-orange-600 text-white">
-                <Link href="/settings">
-                  <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+              <Button
+                asChild
+                size="sm"
+                className="bg-orange-500 hover:bg-orange-600 text-white"
+                onMouseEnter={() => settingsIconRef.current?.startAnimation()}
+                onMouseLeave={() => settingsIconRef.current?.stopAnimation()}
+              >
+                <Link href="/settings" className="flex items-center gap-1.5">
+                  <SettingsIcon ref={settingsIconRef} size={16} />
                   Settings
                 </Link>
               </Button>
-              <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground hover:text-foreground">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                onMouseEnter={() => logoutIconRef.current?.startAnimation()}
+                onMouseLeave={() => logoutIconRef.current?.stopAnimation()}
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1.5"
+              >
+                <LogoutIcon ref={logoutIconRef} size={16} />
                 Log out
               </Button>
             </div>
@@ -138,16 +159,19 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
           {/* Left Sidebar - Sticky */}
           <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
             {/* AI Picker Card */}
-            <Card>
-              <CardContent className="py-1 px-4"> {/* Standard top padding for the whole card */}
-                <CardTitle className="text-lg mb-1 leading-tight"> {/* Control the gap with mb-1 */}
-                  Can&apos;t Decide?
+            <Card
+              onMouseEnter={() => botIconRef.current?.startAnimation()}
+              onMouseLeave={() => botIconRef.current?.stopAnimation()}
+            >
+              <CardContent className="py-1 px-4">
+                <CardTitle className="text-lg mb-2 leading-none flex items-center gap-2">
+                  <BotMessageSquareIcon ref={botIconRef} className="text-purple-500" /> Can&apos;t Decide?
                 </CardTitle>
                 <p className="text-sm text-muted-foreground mb-4">
                   Let our AI pick the perfect spot based on your mood
                 </p>
                 <Button asChild className="w-full bg-gradient-to-r from-purple-500 to-blue-500">
-                  <Link href="/picker">✨ Try AI Picker</Link>
+                  <Link href="/picker">Try AI Picker</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -169,10 +193,14 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
             </Card>
 
             {/* Share Profile Card */}
-            <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50/50">
+            <Card
+              className="border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50/50"
+              onMouseEnter={() => usersIconRef.current?.startAnimation()}
+              onMouseLeave={() => usersIconRef.current?.stopAnimation()}
+            >
               <CardContent>
                 <CardTitle className="text-base mb-2 leading-none flex items-center gap-2">
-                  <span className="text-orange-500">👥</span> Share Your List
+                  <UsersIcon ref={usersIconRef} className="text-orange-500" /> Share Your List
                 </CardTitle>
                 {profile?.username ? (
                   <div className="space-y-3">
@@ -203,10 +231,14 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
           </div>
 
           {/* Right Side - Restaurant List */}
-          <div className="bg-white/60 rounded-xl p-6 border border-orange-100/50">
+          <div
+            className="bg-white/60 rounded-xl p-6 border border-orange-100/50"
+            onMouseEnter={() => mapPinIconRef.current?.startAnimation()}
+            onMouseLeave={() => mapPinIconRef.current?.stopAnimation()}
+          >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold flex items-center gap-2">
-                <span className="text-orange-500">📍</span> Your Saved Restaurants
+                <MapPinIcon ref={mapPinIconRef} className="text-orange-500" size={24} /> Your Saved Restaurants
               </h2>
             </div>
             <Separator className="mb-6 bg-orange-100" />
