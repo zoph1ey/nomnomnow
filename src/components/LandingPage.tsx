@@ -28,12 +28,12 @@ export default function LandingPage() {
 
         <div className="w-full max-w-7xl mx-auto px-6 py-12 grid lg:grid-cols-2 gap-12 items-center relative z-10">
           {/* Left Side - Branding */}
-          <div className="space-y-8">
+          <div className="space-y-8 lg:pl-8">
             <div className="space-y-4">
               <img
                 src="/logo.png"
                 alt="nomnomnow"
-                className="h-auto w-[280px] lg:w-[400px]"
+                className="h-auto w-[320px] lg:w-[500px]"
               />
               <p className="text-2xl lg:text-3xl text-muted-foreground font-medium">
                 Can&apos;t decide what to eat?

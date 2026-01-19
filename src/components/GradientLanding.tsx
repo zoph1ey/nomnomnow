@@ -83,7 +83,7 @@ const AnimatedGradientDemo: React.FC = () => {
             title=""
             value="80%"
             subtitle="Do not know what they want to eat"
-            colors={["#3B82F6", "#60A5FA", "#93C5FD"]}
+            colors={["#bf1111", "#c4a1a1", "#fcb6b6"]}
             delay={0.2}
           />
         </div>
@@ -91,14 +91,14 @@ const AnimatedGradientDemo: React.FC = () => {
           title="AI Food Picker"
           value={ <BotMessageSquare size={50} color="#000000" /> }
           subtitle="Our AI asks a few quick questions about your mood and cravings, then picks the perfect restaurant."
-          colors={["#60A5FA", "#34D399", "#93C5FD"]}
+          colors={["#7dfa89", "#bdf0c2", "#bcccbd"]}
           delay={0.4}
         />
         <BentoCard
           title=""
           value="90%"
           subtitle="Go back to places they already know"
-          colors={["#F59E0B", "#A78BFA", "#FCD34D"]}
+          colors={["#ed8040", "#eda174", "#f2d2bf"]}
           delay={0.6}
         />
         <div className="md:col-span-2">
@@ -106,7 +106,7 @@ const AnimatedGradientDemo: React.FC = () => {
             title="Your Restaurants List"
             value={ <List size={50} color="#000000" /> }
             subtitle="Save all your spots with ratings, notes, and tags like 'date night' or 'quick lunch'."
-            colors={["#3B82F6", "#A78BFA", "#FBCFE8"]}
+            colors={["#4ff7bf", "#c4f2e3", "#e1ede9"]}
             delay={0.8}
           />
         </div>
@@ -115,7 +115,7 @@ const AnimatedGradientDemo: React.FC = () => {
             title=""
             value="70%"
             subtitle="Forget restaurant recommendations"
-            colors={["#EC4899", "#F472B6", "#3B82F6"]}
+            colors={["#eddf45", "#faf193", "#f7f4d5"]}
             delay={1}
           />
         </div>
@@ -124,7 +124,7 @@ const AnimatedGradientDemo: React.FC = () => {
             title="Share with Friends"
             value={ <Users size={50} color="#000000" /> }
             subtitle="Get trusted recommendations from people you know. Share your profile or keep it private."
-            colors={["#EC4899", "#F472B6", "#3B82F6"]}
+            colors={["#61fffa", "#c0fcfb", "#ebfcfc"]}
             delay={1}
           />
         </div>
