@@ -14,8 +14,6 @@ const foodImages = [
   { src: "https://www.svgrepo.com/show/475192/cupcake.svg", alt: "Cupcake" },
   { src: "https://www.svgrepo.com/show/475187/cookies.svg", alt: "Cookies" },
   { src: "https://www.svgrepo.com/show/475209/pancake.svg", alt: "Pancake" },
-  { src: "https://www.svgrepo.com/show/475224/steak.svg", alt: "Steak" },
-  { src: "https://www.svgrepo.com/show/475228/taco.svg", alt: "Taco" },
   { src: "https://www.svgrepo.com/show/475231/thanksgiving.svg", alt: "Chicken" },
   { src: "https://www.svgrepo.com/show/475236/bacon.svg", alt: "Bacon" },
 ];
