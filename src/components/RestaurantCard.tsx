@@ -101,8 +101,9 @@ export default function RestaurantCard({ restaurant, onUpdate, onDelete }: Resta
         onClick={() => !editing && setExpanded(!expanded)}
       >
         <div className="flex-1 min-w-0">
+          {/* Restaurant name row */}
           <div className="flex items-center gap-2">
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">{restaurant.name}</h3>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 sm:truncate">{restaurant.name}</h3>
             {!restaurant.is_public && (
               <span className="text-gray-400 flex-shrink-0" title="Hidden from public profile">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -110,13 +111,27 @@ export default function RestaurantCard({ restaurant, onUpdate, onDelete }: Resta
                 </svg>
               </span>
             )}
+            {/* Stars and price on same line on desktop */}
             {restaurant.rating && (
-              <span className="text-yellow-500 text-base flex-shrink-0">
+              <span className="text-yellow-500 text-base flex-shrink-0 hidden sm:inline">
                 {'★'.repeat(restaurant.rating)}
               </span>
             )}
-            <PriceDisplay value={restaurant.price_range} currency={restaurant.currency} />
+            <span className="hidden sm:inline">
+              <PriceDisplay value={restaurant.price_range} currency={restaurant.currency} />
+            </span>
           </div>
+          {/* Stars and price below name on mobile */}
+          {(restaurant.rating || restaurant.price_range) && (
+            <div className="flex items-center gap-2 mt-0.5 sm:hidden">
+              {restaurant.rating && (
+                <span className="text-yellow-500 text-sm flex-shrink-0">
+                  {'★'.repeat(restaurant.rating)}
+                </span>
+              )}
+              <PriceDisplay value={restaurant.price_range} currency={restaurant.currency} />
+            </div>
+          )}
           <p className="text-gray-500 dark:text-gray-400 text-sm truncate">{restaurant.address}</p>
           {(restaurant.dietary_tags?.length > 0 || restaurant.context_tags?.length > 0) && (
             <div className="mt-1 flex flex-wrap gap-1">
