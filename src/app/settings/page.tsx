@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { getMyProfile, type Profile } from '@/lib/supabase/profiles'
 import { detectCurrency } from '@/lib/currency'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import UsernameForm from '@/components/UsernameForm'
 import CurrencySelector from '@/components/CurrencySelector'
@@ -26,11 +26,19 @@ import { LinkIcon, type LinkIconHandle } from '@/components/ui/link'
 type SettingsSection = 'account' | 'profile' | 'currency' | 'privacy' | 'friends' | 'share'
 
 
-export default function SettingsPage() {
+const VALID_SECTIONS: SettingsSection[] = ['account', 'profile', 'currency', 'privacy', 'friends', 'share']
+
+function SettingsContent() {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeSection, setActiveSection] = useState<SettingsSection>('account')
+  const searchParams = useSearchParams()
+  const initialTab = searchParams.get('tab')
+  const [activeSection, setActiveSection] = useState<SettingsSection>(
+    initialTab && VALID_SECTIONS.includes(initialTab as SettingsSection)
+      ? (initialTab as SettingsSection)
+      : 'account'
+  )
   const router = useRouter()
   const settingsIconRef = useRef<SettingsIconHandle>(null)
   const accountIconRef = useRef<UserIconHandle>(null)
@@ -369,5 +377,19 @@ export default function SettingsPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </main>
+    }>
+      <SettingsContent />
+    </Suspense>
   )
 }

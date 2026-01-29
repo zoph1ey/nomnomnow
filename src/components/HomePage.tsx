@@ -220,7 +220,7 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
                       Set up your username to share your list with friends!
                     </p>
                     <Button asChild variant="outline" className="w-full border-orange-200 hover:bg-orange-50">
-                      <Link href="/settings">
+                      <Link href="/settings?tab=profile">
                         Set Up Username
                       </Link>
                     </Button>
