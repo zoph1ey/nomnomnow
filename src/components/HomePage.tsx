@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import RestaurantSearch from '@/components/RestaurantSearch'
 import SavedRestaurants from '@/components/SavedRestaurants'
@@ -8,6 +8,7 @@ import SaveRestaurantModal from '@/components/SaveRestaurantModal'
 import CopyProfileLink from '@/components/CopyProfileLink'
 import RestaurantFilters from '@/components/RestaurantFilters'
 import { saveRestaurant, DietaryTag, ContextTag } from '@/lib/supabase/restaurants'
+import { getPendingRequestsCount } from '@/lib/supabase/friends'
 import { createClient } from '@/lib/supabase/client'
 import type { Profile } from '@/lib/supabase/profiles'
 import type { User } from '@supabase/supabase-js'
@@ -40,11 +41,16 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
   const [priceFilter, setPriceFilter] = useState<number[]>([])
   const [dietaryFilter, setDietaryFilter] = useState<DietaryTag[]>([])
   const [contextFilter, setContextFilter] = useState<ContextTag[]>([])
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0)
   const usersIconRef = useRef<UsersIconHandle>(null)
   const botIconRef = useRef<BotMessageSquareHandle>(null)
   const mapPinIconRef = useRef<MapPinIconHandle>(null)
   const settingsIconRef = useRef<SettingsIconHandle>(null)
   const logoutIconRef = useRef<LogoutIconHandle>(null)
+
+  useEffect(() => {
+    getPendingRequestsCount().then(setPendingRequestsCount)
+  }, [])
 
   const handleSave = async (data: {
     name: string
@@ -94,13 +100,18 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
               <Button
                 asChild
                 size="sm"
-                className="bg-orange-500 hover:bg-orange-600 text-white"
+                className="bg-orange-500 hover:bg-orange-600 text-white relative"
                 onMouseEnter={() => settingsIconRef.current?.startAnimation()}
                 onMouseLeave={() => settingsIconRef.current?.stopAnimation()}
               >
                 <Link href="/settings" className="flex items-center gap-1.5">
                   <SettingsIcon ref={settingsIconRef} size={16} />
                   <span className="hidden sm:inline">Settings</span>
+                  {pendingRequestsCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      {pendingRequestsCount > 99 ? '99+' : pendingRequestsCount}
+                    </span>
+                  )}
                 </Link>
               </Button>
               <Button

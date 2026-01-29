@@ -11,6 +11,7 @@ import UsernameForm from '@/components/UsernameForm'
 import CurrencySelector from '@/components/CurrencySelector'
 import PrivacySettings from '@/components/PrivacySettings'
 import FriendsSection from '@/components/FriendsSection'
+import { getPendingRequestsCount } from '@/lib/supabase/friends'
 import CopyProfileLink from '@/components/CopyProfileLink'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -32,6 +33,7 @@ function SettingsContent() {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [pendingRequestsCount, setPendingRequestsCount] = useState(0)
   const searchParams = useSearchParams()
   const initialTab = searchParams.get('tab')
   const [activeSection, setActiveSection] = useState<SettingsSection>(
@@ -61,11 +63,15 @@ function SettingsContent() {
       setUser(user)
 
       try {
-        const profileData = await getMyProfile()
+        const [profileData, pendingCount] = await Promise.all([
+          getMyProfile(),
+          getPendingRequestsCount()
+        ])
         if (profileData && !profileData.currency) {
           profileData.currency = detectCurrency()
         }
         setProfile(profileData)
+        setPendingRequestsCount(pendingCount)
       } catch (err) {
         console.error('Failed to load profile:', err)
       }
@@ -334,7 +340,7 @@ function SettingsContent() {
                   onClick={() => setActiveSection('friends')}
                   onMouseEnter={() => friendsIconRef.current?.startAnimation()}
                   onMouseLeave={() => friendsIconRef.current?.stopAnimation()}
-                  className={`flex-shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2 lg:px-4 lg:py-3 rounded-lg text-left transition-colors ${
+                  className={`flex-shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2 lg:px-4 lg:py-3 rounded-lg text-left transition-colors relative ${
                     activeSection === 'friends'
                       ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
                       : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
@@ -345,6 +351,11 @@ function SettingsContent() {
                     <p className={`text-sm whitespace-nowrap ${activeSection === 'friends' ? 'font-medium' : ''}`}>Friends</p>
                     <p className="text-xs text-muted-foreground truncate hidden lg:block">Manage your connections</p>
                   </div>
+                  {pendingRequestsCount > 0 && (
+                    <span className="bg-red-500 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      {pendingRequestsCount > 99 ? '99+' : pendingRequestsCount}
+                    </span>
+                  )}
                   {activeSection === 'friends' && <div className="w-1 h-8 bg-orange-400 rounded-full hidden lg:block" />}
                 </button>
 

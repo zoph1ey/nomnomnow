@@ -163,6 +163,25 @@ export async function getFriends(): Promise<FriendshipWithProfile[]> {
 }
 
 /**
+ * Get count of pending friend requests received by the current user.
+ */
+export async function getPendingRequestsCount(): Promise<number> {
+  const supabase = createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return 0
+
+  const { count, error } = await supabase
+    .from('friendships')
+    .select('*', { count: 'exact', head: true })
+    .eq('addressee_id', user.id)
+    .eq('status', 'pending')
+
+  if (error) return 0
+  return count || 0
+}
+
+/**
  * Get pending friend requests received by the current user.
  */
 export async function getPendingRequests(): Promise<FriendshipWithProfile[]> {
