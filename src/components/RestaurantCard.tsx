@@ -94,7 +94,7 @@ export default function RestaurantCard({ restaurant, onUpdate, onDelete }: Resta
     (restaurant.context_tags && restaurant.context_tags.length > 0)
 
   return (
-    <div className={`p-4 border rounded-lg bg-white dark:bg-gray-900 max-w-3xl ${isLoading ? 'opacity-75' : ''}`}>
+    <div className={`p-3 sm:p-4 border rounded-lg bg-white dark:bg-gray-900 max-w-3xl ${isLoading ? 'opacity-75' : ''}`}>
       {/* Header row */}
       <div
         className="flex justify-between items-start gap-4 cursor-pointer"
@@ -165,14 +165,14 @@ export default function RestaurantCard({ restaurant, onUpdate, onDelete }: Resta
           )}
 
           {confirmDelete ? (
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-gray-500 dark:text-gray-400">Delete?</span>
+            <div className="flex items-center gap-1 flex-wrap sm:flex-nowrap">
+              <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">Delete?</span>
               <button
                 onClick={handleDelete}
                 disabled={isLoading}
                 className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {deleting ? 'Deleting...' : 'Yes'}
+                {deleting ? '...' : 'Yes'}
               </button>
               <button
                 onClick={() => setConfirmDelete(false)}

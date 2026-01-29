@@ -75,7 +75,7 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
     <main className="min-h-screen bg-gradient-to-b from-orange-50/50 to-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="hover:opacity-80 transition-opacity">
@@ -100,7 +100,7 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
               >
                 <Link href="/settings" className="flex items-center gap-1.5">
                   <SettingsIcon ref={settingsIconRef} size={16} />
-                  Settings
+                  <span className="hidden sm:inline">Settings</span>
                 </Link>
               </Button>
               <Button
@@ -112,7 +112,7 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
                 className="text-muted-foreground hover:text-foreground flex items-center gap-1.5"
               >
                 <LogoutIcon ref={logoutIconRef} size={16} />
-                Log out
+                <span className="hidden sm:inline">Log out</span>
               </Button>
             </div>
           </div>
@@ -120,7 +120,7 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
         {/* Search Bar - Full Width */}
         <div className="mb-8">
           <RestaurantSearch onSelect={setSelected} />
@@ -155,7 +155,7 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
         )}
 
         {/* Split Layout */}
-        <div className="grid lg:grid-cols-[380px_minmax(0,1fr)] gap-8">
+        <div className="flex flex-col-reverse lg:grid lg:grid-cols-[380px_minmax(0,1fr)] gap-6 lg:gap-8">
           {/* Left Sidebar - Sticky */}
           <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
             {/* AI Picker Card */}

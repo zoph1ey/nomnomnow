@@ -37,7 +37,7 @@ function AssistantMessage({ content }: { content: string }) {
         className="text-purple-500 flex-shrink-0 mb-1"
       />
       <div
-        className="max-w-[80%] lg:max-w-[60%] px-4 py-3 rounded-2xl bg-orange-50 border border-orange-100 cursor-default"
+        className="max-w-[85%] sm:max-w-[80%] lg:max-w-[60%] px-4 py-3 rounded-2xl bg-orange-50 border border-orange-100 cursor-default"
         onMouseEnter={() => iconRef.current?.startAnimation()}
         onMouseLeave={() => iconRef.current?.stopAnimation()}
       >
@@ -127,9 +127,9 @@ export default function PickerChat() {
   }, [discoveredPlaces]);
 
   return (
-    <Card className="flex flex-col h-[calc(100vh-200px)] min-h-[500px] border-orange-100 bg-white/80 py-0 overflow-hidden">
+    <Card className="flex flex-col h-[calc(100vh-140px)] sm:h-[calc(100vh-200px)] min-h-[400px] sm:min-h-[500px] border-orange-100 bg-white/80 py-0 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-orange-100 bg-gradient-to-r from-orange-50/50 to-amber-50/50">
+      <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 border-b border-orange-100 bg-gradient-to-r from-orange-50/50 to-amber-50/50">
         <span className="font-medium">Chat with AI</span>
         <Button
           onClick={resetChat}
@@ -145,11 +145,11 @@ export default function PickerChat() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         {messages.map((message, index) =>
           message.role === "user" ? (
             <div key={index} className="flex justify-end">
-              <div className="max-w-[80%] lg:max-w-[60%] px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+              <div className="max-w-[85%] sm:max-w-[80%] lg:max-w-[60%] px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-500 to-blue-500 text-white">
                 <p className="whitespace-pre-wrap">{message.content}</p>
               </div>
             </div>
@@ -239,7 +239,7 @@ export default function PickerChat() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-orange-100 p-4 bg-gradient-to-r from-orange-50/30 to-amber-50/30">
+      <div className="border-t border-orange-100 p-3 sm:p-4 bg-gradient-to-r from-orange-50/30 to-amber-50/30">
         <div className="flex gap-3">
           <input
             type="text"

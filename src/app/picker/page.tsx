@@ -41,7 +41,7 @@ export default function PickerPage() {
         onMouseEnter={() => botIconRef.current?.startAnimation()}
         onMouseLeave={() => botIconRef.current?.stopAnimation()}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm" className="hover:bg-orange-50">
               <Link href="/">
@@ -60,7 +60,7 @@ export default function PickerPage() {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
         {user ? (
           <PickerChat />
         ) : (

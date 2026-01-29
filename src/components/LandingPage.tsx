@@ -20,22 +20,22 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen">
       {/* Hero Section - Split Layout */}
-      <section className="min-h-[85vh] flex items-center relative">
+      <section className="min-h-[auto] py-12 lg:min-h-[85vh] lg:py-0 flex items-center relative">
         {/* Background decoration */}
         <div className="absolute inset-0 z-0 opacity-10 pointer-events-none overflow-hidden">
           <FoodScrollingBackground />
         </div>
 
-        <div className="w-full max-w-7xl mx-auto px-6 py-12 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+        <div className="w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 sm:py-12 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
           {/* Left Side - Branding */}
           <div className="space-y-8 lg:pl-8">
             <div className="space-y-4">
               <img
                 src="/logo.png"
                 alt="nomnomnow"
-                className="h-auto w-[320px] lg:w-[500px]"
+                className="h-auto w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[500px]"
               />
-              <p className="text-2xl lg:text-3xl text-muted-foreground font-medium">
+              <p className="text-xl sm:text-2xl lg:text-3xl text-muted-foreground font-medium">
                 Can&apos;t decide what to eat?
               </p>
             </div>
@@ -72,7 +72,7 @@ export default function LandingPage() {
 
       {/* CTA Footer */}
       <section className="py-12">
-        <div className="max-w-7xl mx-auto px-6 text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-2xl font-bold mb-3">Stop scrolling. Start eating.</h2>
           <p className="text-muted-foreground mb-6">
             Join thousands who&apos;ve solved their "What to eat?" dilemma.

@@ -88,8 +88,8 @@ export default function SaveRestaurantModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-3 sm:p-4 z-50">
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-lg w-full max-h-[85vh] sm:max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           {/* Header */}
           <div className="p-4 border-b dark:border-gray-700">
@@ -130,7 +130,7 @@ export default function SaveRestaurantModal({
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
                 This restaurant accommodates:
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-2">
                 {DIETARY_TAGS.map(tag => (
                   <label
                     key={tag}

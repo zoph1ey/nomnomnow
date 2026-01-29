@@ -220,7 +220,7 @@ export default function SettingsPage() {
         onMouseEnter={() => settingsIconRef.current?.startAnimation()}
         onMouseLeave={() => settingsIconRef.current?.stopAnimation()}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center gap-4">
             <Button asChild variant="ghost" size="sm" className="hover:bg-orange-50">
               <Link href="/">
@@ -239,18 +239,18 @@ export default function SettingsPage() {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-[280px_1fr] gap-8">
-          {/* Left Sidebar - Navigation */}
+      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 sm:py-8">
+        <div className="flex flex-col lg:grid lg:grid-cols-[280px_1fr] gap-6 lg:gap-8">
+          {/* Left Sidebar - Navigation (horizontal scroll on mobile) */}
           <div className="space-y-2 lg:sticky lg:top-24 lg:self-start">
             <Card className="border-orange-100 bg-white/80">
-              <CardContent className="p-2">
+              <CardContent className="p-2 flex lg:block overflow-x-auto gap-2 lg:gap-0">
                 {/* Account */}
                 <button
                   onClick={() => setActiveSection('account')}
                   onMouseEnter={() => accountIconRef.current?.startAnimation()}
                   onMouseLeave={() => accountIconRef.current?.stopAnimation()}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={`flex-shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2 lg:px-4 lg:py-3 rounded-lg text-left transition-colors ${
                     activeSection === 'account'
                       ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
                       : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
@@ -258,10 +258,10 @@ export default function SettingsPage() {
                 >
                   <UserIcon ref={accountIconRef} size={20} className={activeSection === 'account' ? 'text-orange-500' : ''} />
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${activeSection === 'account' ? 'font-medium' : ''}`}>Account</p>
-                    <p className="text-xs text-muted-foreground truncate">Your account information</p>
+                    <p className={`text-sm whitespace-nowrap ${activeSection === 'account' ? 'font-medium' : ''}`}>Account</p>
+                    <p className="text-xs text-muted-foreground truncate hidden lg:block">Your account information</p>
                   </div>
-                  {activeSection === 'account' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                  {activeSection === 'account' && <div className="w-1 h-8 bg-orange-400 rounded-full hidden lg:block" />}
                 </button>
 
                 {/* Profile */}
@@ -269,7 +269,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection('profile')}
                   onMouseEnter={() => profileIconRef.current?.startAnimation()}
                   onMouseLeave={() => profileIconRef.current?.stopAnimation()}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={`flex-shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2 lg:px-4 lg:py-3 rounded-lg text-left transition-colors ${
                     activeSection === 'profile'
                       ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
                       : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
@@ -277,10 +277,10 @@ export default function SettingsPage() {
                 >
                   <FilePenLineIcon ref={profileIconRef} size={20} className={activeSection === 'profile' ? 'text-orange-500' : ''} />
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${activeSection === 'profile' ? 'font-medium' : ''}`}>Profile</p>
-                    <p className="text-xs text-muted-foreground truncate">Username & public profile</p>
+                    <p className={`text-sm whitespace-nowrap ${activeSection === 'profile' ? 'font-medium' : ''}`}>Profile</p>
+                    <p className="text-xs text-muted-foreground truncate hidden lg:block">Username & public profile</p>
                   </div>
-                  {activeSection === 'profile' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                  {activeSection === 'profile' && <div className="w-1 h-8 bg-orange-400 rounded-full hidden lg:block" />}
                 </button>
 
                 {/* Currency */}
@@ -288,7 +288,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection('currency')}
                   onMouseEnter={() => currencyIconRef.current?.startAnimation()}
                   onMouseLeave={() => currencyIconRef.current?.stopAnimation()}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={`flex-shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2 lg:px-4 lg:py-3 rounded-lg text-left transition-colors ${
                     activeSection === 'currency'
                       ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
                       : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
@@ -296,10 +296,10 @@ export default function SettingsPage() {
                 >
                   <CircleDollarSignIcon ref={currencyIconRef} size={20} className={activeSection === 'currency' ? 'text-orange-500' : ''} />
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${activeSection === 'currency' ? 'font-medium' : ''}`}>Currency</p>
-                    <p className="text-xs text-muted-foreground truncate">Price display preferences</p>
+                    <p className={`text-sm whitespace-nowrap ${activeSection === 'currency' ? 'font-medium' : ''}`}>Currency</p>
+                    <p className="text-xs text-muted-foreground truncate hidden lg:block">Price display preferences</p>
                   </div>
-                  {activeSection === 'currency' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                  {activeSection === 'currency' && <div className="w-1 h-8 bg-orange-400 rounded-full hidden lg:block" />}
                 </button>
 
                 {/* Privacy */}
@@ -307,7 +307,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection('privacy')}
                   onMouseEnter={() => privacyIconRef.current?.startAnimation()}
                   onMouseLeave={() => privacyIconRef.current?.stopAnimation()}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={`flex-shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2 lg:px-4 lg:py-3 rounded-lg text-left transition-colors ${
                     activeSection === 'privacy'
                       ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
                       : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
@@ -315,10 +315,10 @@ export default function SettingsPage() {
                 >
                   <LockOpenIcon ref={privacyIconRef} size={20} className={activeSection === 'privacy' ? 'text-orange-500' : ''} />
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${activeSection === 'privacy' ? 'font-medium' : ''}`}>Privacy</p>
-                    <p className="text-xs text-muted-foreground truncate">Who can see your list</p>
+                    <p className={`text-sm whitespace-nowrap ${activeSection === 'privacy' ? 'font-medium' : ''}`}>Privacy</p>
+                    <p className="text-xs text-muted-foreground truncate hidden lg:block">Who can see your list</p>
                   </div>
-                  {activeSection === 'privacy' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                  {activeSection === 'privacy' && <div className="w-1 h-8 bg-orange-400 rounded-full hidden lg:block" />}
                 </button>
 
                 {/* Friends */}
@@ -326,7 +326,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection('friends')}
                   onMouseEnter={() => friendsIconRef.current?.startAnimation()}
                   onMouseLeave={() => friendsIconRef.current?.stopAnimation()}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={`flex-shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2 lg:px-4 lg:py-3 rounded-lg text-left transition-colors ${
                     activeSection === 'friends'
                       ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
                       : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
@@ -334,10 +334,10 @@ export default function SettingsPage() {
                 >
                   <UserRoundPlusIcon ref={friendsIconRef} size={20} className={activeSection === 'friends' ? 'text-orange-500' : ''} />
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${activeSection === 'friends' ? 'font-medium' : ''}`}>Friends</p>
-                    <p className="text-xs text-muted-foreground truncate">Manage your connections</p>
+                    <p className={`text-sm whitespace-nowrap ${activeSection === 'friends' ? 'font-medium' : ''}`}>Friends</p>
+                    <p className="text-xs text-muted-foreground truncate hidden lg:block">Manage your connections</p>
                   </div>
-                  {activeSection === 'friends' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                  {activeSection === 'friends' && <div className="w-1 h-8 bg-orange-400 rounded-full hidden lg:block" />}
                 </button>
 
                 {/* Share */}
@@ -345,7 +345,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveSection('share')}
                   onMouseEnter={() => shareIconRef.current?.startAnimation()}
                   onMouseLeave={() => shareIconRef.current?.stopAnimation()}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={`flex-shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 py-2 lg:px-4 lg:py-3 rounded-lg text-left transition-colors ${
                     activeSection === 'share'
                       ? 'bg-gradient-to-r from-orange-100 to-amber-50 text-orange-700 font-medium'
                       : 'hover:bg-orange-50 text-muted-foreground hover:text-foreground'
@@ -353,17 +353,17 @@ export default function SettingsPage() {
                 >
                   <LinkIcon ref={shareIconRef} size={20} className={activeSection === 'share' ? 'text-orange-500' : ''} />
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm ${activeSection === 'share' ? 'font-medium' : ''}`}>Share</p>
-                    <p className="text-xs text-muted-foreground truncate">Share your profile</p>
+                    <p className={`text-sm whitespace-nowrap ${activeSection === 'share' ? 'font-medium' : ''}`}>Share</p>
+                    <p className="text-xs text-muted-foreground truncate hidden lg:block">Share your profile</p>
                   </div>
-                  {activeSection === 'share' && <div className="w-1 h-8 bg-orange-400 rounded-full" />}
+                  {activeSection === 'share' && <div className="w-1 h-8 bg-orange-400 rounded-full hidden lg:block" />}
                 </button>
               </CardContent>
             </Card>
           </div>
 
           {/* Right Side - Content */}
-          <div className="bg-white/60 rounded-xl p-6 border border-orange-100/50 min-h-[500px]">
+          <div className="bg-white/60 rounded-xl p-4 sm:p-6 border border-orange-100/50 min-h-[400px] lg:min-h-[500px]">
             {renderSectionContent()}
           </div>
         </div>
