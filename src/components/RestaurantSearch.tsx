@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useLoadScript, Autocomplete } from '@react-google-maps/api'
+import { SearchIcon, type SearchIconHandle } from '@/components/ui/search'
 
 const libraries: ("places")[] = ['places']
 
@@ -56,6 +57,7 @@ export function getCountryCurrency(countryCode: string | null): string {
 
 export default function RestaurantSearch({ onSelect }: Props) {
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null)
+  const searchIconRef = useRef<SearchIconHandle>(null)
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY!,
@@ -94,11 +96,22 @@ export default function RestaurantSearch({ onSelect }: Props) {
         types: ['restaurant', 'cafe', 'bar', 'food'],
       }}
     >
-      <input
-        type="text"
-        placeholder="Search for a restaurant..."
-        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+      <div
+        className="relative"
+        onMouseEnter={() => searchIconRef.current?.startAnimation()}
+        onMouseLeave={() => searchIconRef.current?.stopAnimation()}
+      >
+        <SearchIcon
+          ref={searchIconRef}
+          size={20}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+        />
+        <input
+          type="text"
+          placeholder="Search for a restaurant..."
+          className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 border-orange-200"
+        />
+      </div>
     </Autocomplete>
   )
 }
