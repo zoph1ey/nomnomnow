@@ -78,16 +78,16 @@ export default function HomePage({ user, profile, onLogout }: HomePageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="hover:opacity-80 transition-opacity">
+            <Link href="/" className="hover:opacity-80 transition-opacity flex-shrink-0">
               <img
                 src="/logo.png"
                 alt="nomnomnow"
-                className="h-9 w-auto"
+                className="h-7 sm:h-9 w-auto"
               />
             </Link>
 
             {/* User Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3">
               <span className="text-sm text-muted-foreground hidden sm:inline">
                 {profile?.username ? `@${profile.username}` : user.email}
               </span>
